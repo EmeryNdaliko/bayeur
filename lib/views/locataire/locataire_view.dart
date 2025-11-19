@@ -1,16 +1,5 @@
-import 'package:bayer/costante/app_colors.dart';
-import 'package:bayer/costante/extension.dart';
-import 'package:bayer/models/locataire_model.dart';
-import 'package:bayer/rensponsive/rensponsive.dart';
-import 'package:bayer/views/forms/locataire_form.dart';
-import 'package:bayer/views/locataire/locataire_details.dart';
-import 'package:bayer/widget/button_widget.dart';
-import 'package:bayer/widget/empty_state.dart';
-import 'package:bayer/widget/search_widget.dart';
-import 'package:data_table_2/data_table_2.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:icons_plus/icons_plus.dart';
+import 'package:bayer/costante/export.dart';
+import 'package:bayer/widget/dialog_widget.dart';
 
 class LocataireView extends StatefulWidget {
   const LocataireView({super.key});
@@ -21,18 +10,30 @@ class LocataireView extends StatefulWidget {
 
 class _LocataireViewState extends State<LocataireView> {
   List<LocataireModel> locataires = [];
+  bool isLoading = false;
+
+  Future<void> fetchData() async {
+    if (mounted) {
+      setState(() {
+        isLoading = true;
+      });
+    }
+    var data = await api.getData('locataire/list');
+    if (data != null) {
+      locataires = data.map((e) => LocataireModel.fromJson(e)).toList();
+      logger.i(locataires);
+    }
+
+    if (mounted) {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   void initState() {
-    locataires = List.generate(
-      10,
-      (index) => LocataireModel.build(
-        id: index.toString(),
-        nom: 'Emery ndaliko kambale $index',
-        email: 'locataire$index@example.com',
-        password: '${String.fromCharCode(65 + index)}assword123',
-      ),
-    );
+    fetchData();
     super.initState();
   }
 
@@ -54,7 +55,10 @@ class _LocataireViewState extends State<LocataireView> {
                   showIcon: false,
                   width: 200,
                   borderSize: 50,
-                  onTap: () => Get.dialog(const Dialog(child: LocataireForm())),
+                  onTap: () => Get.dialog(DialogWidget(
+                      child: LocataireForm(
+                    onSave: fetchData,
+                  ))),
                 ),
               ],
             ),
@@ -63,78 +67,109 @@ class _LocataireViewState extends State<LocataireView> {
 
             /// --- Tableau ou État vide ---
             Expanded(
-              child: locataires.isEmpty
-                  ? const EmptyState(title: 'Aucun locataire trouvé')
-                  : Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: DataTable2(
-                        minWidth: 900,
-                        columnSpacing: 16,
-                        horizontalMargin: 16,
-                        dividerThickness: 1,
-                        headingRowColor: WidgetStateProperty.all(
-                            AppColors.primaryLight.withAlpha(20)),
-                        headingTextStyle:
-                            Theme.of(context).textTheme.bodyLarge!.copyWith(
-                                  fontWeight: FontWeight.bold,
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : locataires.isEmpty
+                      ? const EmptyState(title: 'Aucun locataire trouvé')
+                      : Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: DataTable2(
+                            minWidth: 900,
+                            columnSpacing: 16,
+                            horizontalMargin: 16,
+                            dividerThickness: 1,
+                            headingRowColor: WidgetStateProperty.all(
+                                AppColors.primaryLight.withAlpha(20)),
+                            headingTextStyle: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(
+                                  fontWeight: FontWeight.w900,
                                   color: AppColors.primary,
                                 ),
-                        dataRowHeight: 40,
-                        columns: const [
-                          DataColumn2(label: Text('Noms')),
-                          DataColumn2(label: Text('Email')),
-                          DataColumn2(label: Text('Téléphone')),
-                          DataColumn2(label: Text('Actions')),
-                        ],
-                        rows: locataires
-                            .map(
-                              (loc) => DataRow2(
-                                onTap: () => Get.to(
-                                    () => LocataireDetails(locataire: loc)),
-                                cells: [
-                                  DataCell(Row(
-                                    spacing: 10,
-                                    children: [
-                                      Icon(Iconsax.gallery_bold,
-                                          color: AppColors.primary),
-                                      Text(loc.nom),
+                            dataRowHeight: 40,
+                            columns: const [
+                              DataColumn2(label: Text('Noms')),
+                              DataColumn2(label: Text('Email')),
+                              DataColumn2(label: Text('Téléphone')),
+                              DataColumn2(label: Text('Actions')),
+                            ],
+                            rows: locataires
+                                .map(
+                                  (loc) => DataRow2(
+                                    onTap: () => Get.to(
+                                        () => LocataireDetails(locataire: loc)),
+                                    cells: [
+                                      DataCell(Row(
+                                        spacing: 10,
+                                        children: [
+                                          CircleAvatar(
+                                            backgroundColor:
+                                                AppColors.primaryLightAccent,
+                                            child: Text(
+                                                (locataires.indexOf(loc) + 1)
+                                                    .toString()),
+                                          ).size(30, 30),
+                                          Text(loc.nom),
+                                        ],
+                                      )),
+                                      DataCell(Text(loc.email)),
+                                      const DataCell(Text('Aucun numéro')),
+                                      DataCell(Row(
+                                        spacing: 10,
+                                        children: [
+                                          const Icon(
+                                            Iconsax.edit_2_outline,
+                                            color: AppColors.red,
+                                          ).clickable(ontap: () {
+                                            Get.dialog(
+                                              DialogWidget(
+                                                child: LocataireForm(
+                                                  locataire: loc,
+                                                  onSave: fetchData,
+                                                ),
+                                              ),
+                                            );
+                                          }),
+                                          const Icon(
+                                            Iconsax.trash_outline,
+                                          ).clickable(ontap: () {
+                                            EasyLoading.showError('delete');
+                                          })
+                                        ],
+                                      )
+                                          // PopupMenuButton(
+                                          //   shape: RoundedRectangleBorder(
+                                          //       borderRadius:
+                                          //           BorderRadius.circular(10)),
+                                          //   itemBuilder: (context) => [
+                                          //     const PopupMenuItem(
+                                          //         value: 'edit',
+                                          //         child: Text('Modifier')),
+                                          //     const PopupMenuItem(
+                                          //         value: 'delete',
+                                          //         child: Text('Supprimer')),
+                                          //     const PopupMenuItem(
+                                          //         value: 'details',
+                                          //         child: Text('Détails')),
+                                          //   ],
+                                          //   onSelected: (value) {
+                                          //     if (value == 'details') {
+                                          //       Get.to(() => LocataireDetails(
+                                          //           locataire: loc));
+                                          //     }
+                                          //   },
+                                          // ),
+                                          ),
                                     ],
-                                  )),
-                                  DataCell(Text(loc.email)),
-                                  const DataCell(Text('Aucun numéro')),
-                                  DataCell(
-                                    PopupMenuButton(
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10)),
-                                      itemBuilder: (context) => [
-                                        const PopupMenuItem(
-                                            value: 'edit',
-                                            child: Text('Modifier')),
-                                        const PopupMenuItem(
-                                            value: 'delete',
-                                            child: Text('Supprimer')),
-                                        const PopupMenuItem(
-                                            value: 'details',
-                                            child: Text('Détails')),
-                                      ],
-                                      onSelected: (value) {
-                                        if (value == 'details') {
-                                          Get.to(() =>
-                                              LocataireDetails(locataire: loc));
-                                        }
-                                      },
-                                    ),
                                   ),
-                                ],
-                              ),
-                            )
-                            .toList(),
-                      ),
-                    ),
+                                )
+                                .toList(),
+                          ),
+                        ),
             ),
           ],
         ),
@@ -152,7 +187,10 @@ class _LocataireViewState extends State<LocataireView> {
                 const SizedBox(width: 8),
                 GestureDetector(
                   onTap: () => Get.dialog(
-                    const Dialog(child: LocataireForm()),
+                    Dialog(
+                        child: LocataireForm(
+                      onSave: () => fetchData(),
+                    )),
                   ),
                   child: Container(
                     height: 40,

@@ -3,6 +3,7 @@ import 'package:bayer/costante/extension.dart';
 import 'package:bayer/rensponsive/rensponsive.dart';
 import 'package:bayer/views/locataire/locataire_view.dart';
 import 'package:bayer/views/owner_dashboard.dart';
+import 'package:bayer/views/profil_view.dart';
 import 'package:bayer/views/property_view.dart';
 import 'package:bayer/views/setting_view.dart';
 import 'package:flutter/material.dart';
@@ -23,28 +24,27 @@ class _HomeViewState extends State<HomeView> {
         {
           'widget': const Dashboard(),
           'title': 'Accueil',
-          'icon': Icon(Iconsax.home_2_outline)
+          'icon': Iconsax.home_2_outline
         },
-        // {'widget': const Dashboard(), 'title': 'Actualité'},
         {
           'widget': const LocataireView(),
           'title': 'Locataire',
-          'icon': Icon(Iconsax.user_tag_outline),
+          'icon': Iconsax.user_tag_outline,
         },
         {
           'widget': const PropertyView(),
           'title': 'Propriété',
-          'icon': Icon(Iconsax.building_3_bold)
+          'icon': Iconsax.building_3_outline,
         },
         {
           'widget': const SettingView(),
           'title': 'Paramètres',
-          'icon': Icon(Iconsax.setting_2_bold),
+          'icon': Iconsax.setting_2_outline,
         },
         {
-          'widget': const SettingView(),
+          'widget': const ProfilView(),
           'title': 'Profil',
-          'icon': Icon(Iconsax.setting_2_bold),
+          'icon': Iconsax.user_outline,
         },
       ];
 
@@ -78,15 +78,25 @@ class _HomeViewState extends State<HomeView> {
                                         ? AppColors.primaryLight
                                         : null,
                                     borderRadius: BorderRadius.circular(20)),
-                                child: Text(
-                                  pages[index]['title'],
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.primary),
-                                ).clickable(
-                                    ontap: () =>
-                                        setState(() => currentIndex = index)),
+                                child: Row(
+                                  children: [
+                                    5.width,
+                                    Icon(
+                                      pages[index]['icon'],
+                                      size: 15,
+                                    ),
+                                    5.width,
+                                    Text(
+                                      pages[index]['title'],
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.primary),
+                                    ).clickable(
+                                        ontap: () => setState(
+                                            () => currentIndex = index)),
+                                  ],
+                                ),
                               )),
                     ],
                   ),
@@ -123,13 +133,16 @@ class _HomeViewState extends State<HomeView> {
                     currentIndex = value;
                   });
                 },
-                fixedColor: AppColors.primary,
-                // backgroundColor: AppColors.background,
+                fixedColor: AppColors.primaryLight,
+                // backgroundColor: AppColors.cardBackground,
+                backgroundColor: AppColors.primary,
+                unselectedItemColor: Colors.white,
                 elevation: 1,
                 items: List<BottomNavigationBarItem>.generate(
                   pages.length,
                   (index) => BottomNavigationBarItem(
-                      icon: pages[index]['icon'], label: pages[index]['title']),
+                      icon: Icon(pages[index]['icon']),
+                      label: pages[index]['title']),
                 ).toList())));
   }
 

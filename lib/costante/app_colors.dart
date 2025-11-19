@@ -5,7 +5,7 @@ class AppColors {
   static const Color primary = Color(0xFF1f4841); // Bleu vif et moderne
   static const Color primaryLight = Color(0xFFbef59b); // Bleu clair
   static const Color primaryLightAccent = Color(0xFFecf4e9); // Bleu clair
-  static const Color secondary =
+  static const Color orange =
       Color(0xFFFFA726); // Orange lumineux pour boutons et accents
 
   // Couleurs de fond
@@ -19,6 +19,8 @@ class AppColors {
 
   // Couleurs d’état
   static const Color success = Color(0xFF4CAF50); // Paiement OK
+  static const Color secondary = Color(0xFF4CAF50); // Paiement OK
   static const Color warning = Color(0xFFFFC107); // Retard de paiement
   static const Color error = Color(0xFFF44336); // Erreur ou impayé
+  static const Color red = Colors.red; //
 }

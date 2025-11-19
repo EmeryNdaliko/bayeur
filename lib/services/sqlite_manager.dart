@@ -29,7 +29,7 @@ class SqliteManager {
   final List<MigrationStep> _migrations = [];
   Database? _db;
 
-  SqliteManager({this.dbName = 'app_database.db'});
+  SqliteManager({this.dbName = 'bayeur.db'});
 
   /// Register a migration step. Each entry corresponds to upgrading
   /// from version N to N+1 for the order they are added.

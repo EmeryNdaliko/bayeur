@@ -20,7 +20,7 @@ class _PropertyViewState extends State<PropertyView> {
       children: [
         Row(
           children: [
-            Expanded(child: const SearchField()),
+            const Expanded(child: SearchField()),
             const SizedBox(width: 5),
             MouseRegion(
               cursor: SystemMouseCursors.click,
@@ -101,7 +101,7 @@ class _PropertyViewState extends State<PropertyView> {
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w900,
-                                  color: AppColors.primaryLight,
+                                  color: AppColors.secondary,
                                 ),
                               ),
                               Text(
@@ -109,7 +109,7 @@ class _PropertyViewState extends State<PropertyView> {
                                 style: TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.w200,
-                                  color: AppColors.primaryLight,
+                                  color: AppColors.secondary,
                                 ),
                               ),
                             ],

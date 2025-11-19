@@ -2,11 +2,13 @@ import 'package:bayer/costante/export.dart';
 import 'package:bayer/services/api.dart';
 import 'package:logger/logger.dart';
 
-final api = ApiHelper(baseUrl: 'https://monapi.com/api');
+// final api = ApiHelper(baseUrl: 'http://192.168.101.1/bayeur_api');
+final api = ApiHelper(baseUrl: 'http://localhost/bayeur_api');
 void main() async {
-  await api.initConnection(); // 🔹 Initialisée une seule fois
+  await api
+      .initConnection(); //  Initialisation de la connexion api -> une seule fois
 
-  // final locataires = await api.getData('locataires');
+  // final locataires = await api.getData('locataire/list');
   // if (locataires != null) {
   //   logger.i("Données locataires reçues : $locataires");
   // }

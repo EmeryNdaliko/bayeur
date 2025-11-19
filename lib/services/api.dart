@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:bayer/main.dart';
+import 'package:bayer/costante/export.dart';
 import 'package:http/http.dart' as http;
 
 class ApiHelper {
@@ -52,7 +52,7 @@ class ApiHelper {
   }
 
   /// Requête POST générique
-  Future<Map<String, dynamic>?> postData(
+  Future<bool> postData(
       String endpoint, Map<String, dynamic> data) async {
     if (!_isConnected) await initConnection();
 
@@ -63,16 +63,25 @@ class ApiHelper {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(data),
       );
+      logger.w(response.request?.url);
+      logger.w(response.body);
 
       if (response.statusCode == 200) {
-        return jsonDecode(response.body);
+        var decodedRes = jsonDecode(response.body);
+        EasyLoading.showToast(decodedRes['message']);
+
+        return true;
       } else {
-        logger.i('Erreur POST: ${response.statusCode}');
-        return null;
+        EasyLoading.showToast('errueur d\'ajout du locataire');
+        logger.e('Erreur POST: ${response.statusCode}');
+           return false;
+        
       }
     } catch (e) {
-      logger.i('Erreur POST: $e');
-      return null;
+      
+      logger.e('Erreur POST: $e');
+         return false;
+   
     }
   }
 
@@ -83,9 +92,10 @@ class ApiHelper {
     try {
       final url = Uri.parse('$baseUrl/$endpoint');
       final response = await http.get(url);
+      logger.w(response.request?.url);
 
       if (response.statusCode == 200) {
-        return jsonDecode(response.body);
+        return jsonDecode(response.body)['data'];
       } else {
         logger.i('Erreur GET: ${response.statusCode}');
         return null;

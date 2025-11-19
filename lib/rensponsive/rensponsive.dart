@@ -1,5 +1,3 @@
-
-
 import 'package:bayer/costante/export.dart';
 
 class Rensponsive extends StatelessWidget {

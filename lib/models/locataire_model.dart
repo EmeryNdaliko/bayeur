@@ -1,8 +1,12 @@
+import 'package:bayer/costante/export.dart';
+import 'package:bayer/main.dart';
+
 class LocataireModel {
-  String? id;
+  int? id;
   String nom = '';
   String email = '';
   String password = '';
+  String adresse = '';
   // TypeUser type = TypeUser.locataire;
   LocataireModel();
 
@@ -10,6 +14,7 @@ class LocataireModel {
     this.id,
     required this.nom,
     required this.email,
+    required this.adresse,
     required this.password,
     // required this.type,
   });
@@ -19,6 +24,7 @@ class LocataireModel {
       id: data['locataire_id'],
       nom: data['nom'] ?? '',
       email: data['email'] ?? '',
+      adresse: data['adresse'] ?? '',
       password: data['password'] ?? '',
     );
     // type: TypeUser.values.byName(data['type']));
@@ -29,8 +35,21 @@ class LocataireModel {
       'locataire_id': id,
       'nom': nom,
       'email': email,
+      'adresse': adresse,
       'password': password,
       // 'type': type.name,
     };
+  }
+
+  Future<void> insert() async {
+    EasyLoading.show(
+        status: 'Patientez...', maskType: EasyLoadingMaskType.black);
+    var success = await api.postData('locataire/insert', toJson());
+    logger.i(toJson());
+    if (success) {
+      EasyLoading.showSuccess('Ajout du locataire reussi');
+    } else {
+      EasyLoading.showError('Echec d\'ajout du locataire');
+    }
   }
 }
