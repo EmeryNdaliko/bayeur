@@ -1,4 +1,5 @@
 import 'package:bayer/costante/export.dart';
+import 'package:bayer/widget/ask_yes_no_widget.dart';
 import 'package:bayer/widget/dialog_widget.dart';
 
 class LocataireView extends StatefulWidget {
@@ -11,30 +12,67 @@ class LocataireView extends StatefulWidget {
 class _LocataireViewState extends State<LocataireView> {
   List<LocataireModel> locataires = [];
   bool isLoading = false;
+  SqliteManager db = SqliteManager();
+  String query = '';
+  final TextEditingController searchController = TextEditingController();
 
   Future<void> fetchData() async {
-    if (mounted) {
-      setState(() {
-        isLoading = true;
-      });
-    }
-    var data = await api.getData('locataire/list');
-    if (data != null) {
-      locataires = data.map((e) => LocataireModel.fromJson(e)).toList();
-      logger.i(locataires);
-    }
+    try {
+      if (mounted) {
+        setState(() {
+          isLoading = true;
+        });
+      }
 
-    if (mounted) {
-      setState(() {
-        isLoading = false;
-      });
+      // var data = await api.getData('locataire/list');
+      var data = await db.query('locataires');
+      locataires = data.map((e) => LocataireModel.fromJson(e)).toList();
+
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } on Exception catch (e) {
+      EasyLoading.showError("Erreur : $e");
+      logger.e("Erreur : $e");
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
+  }
+
+  void deleteLocataire(LocataireModel locataire) {
+    Get.dialog(AskYesNoWidget(
+      onConfirm: () async {
+        await locataire.delete().then(
+          (value) {
+            if (value) {
+              fetchData();
+            }
+          },
+        );
+      },
+    ));
   }
 
   @override
   void initState() {
     fetchData();
     super.initState();
+  }
+
+  void _showForm([LocataireModel? locataire]) {
+    Get.dialog(
+        DialogWidget(
+            child: LocataireForm(
+          onSave: fetchData,
+          locataire: locataire,
+        )),
+        transitionCurve: Curves.bounceInOut);
   }
 
   @override
@@ -48,7 +86,11 @@ class _LocataireViewState extends State<LocataireView> {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                const SizedBox(width: 300, child: SearchField()),
+                SizedBox(
+                    width: 300,
+                    child: SearchField(
+                      controller: searchController,
+                    )),
                 const SizedBox(width: 10),
                 MyButton(
                   label: "Nouveau locataire",
@@ -94,14 +136,15 @@ class _LocataireViewState extends State<LocataireView> {
                             columns: const [
                               DataColumn2(label: Text('Noms')),
                               DataColumn2(label: Text('Email')),
+                              DataColumn2(label: Text('Adresse')),
                               DataColumn2(label: Text('Téléphone')),
                               DataColumn2(label: Text('Actions')),
                             ],
                             rows: locataires
                                 .map(
-                                  (loc) => DataRow2(
-                                    onTap: () => Get.to(
-                                        () => LocataireDetails(locataire: loc)),
+                                  (locataire) => DataRow2(
+                                    onTap: () => Get.to(() =>
+                                        LocataireDetails(locataire: locataire)),
                                     cells: [
                                       DataCell(Row(
                                         spacing: 10,
@@ -110,60 +153,42 @@ class _LocataireViewState extends State<LocataireView> {
                                             backgroundColor:
                                                 AppColors.primaryLightAccent,
                                             child: Text(
-                                                (locataires.indexOf(loc) + 1)
+                                                (locataires.indexOf(locataire) +
+                                                        1)
                                                     .toString()),
                                           ).size(30, 30),
-                                          Text(loc.nom),
+                                          Text(locataire.nom.firstMaj()),
                                         ],
                                       )),
-                                      DataCell(Text(loc.email)),
+                                      DataCell(Text(locataire.email)),
+                                      DataCell(
+                                          Text(locataire.adresse.firstMaj())),
                                       const DataCell(Text('Aucun numéro')),
-                                      DataCell(Row(
-                                        spacing: 10,
-                                        children: [
-                                          const Icon(
-                                            Iconsax.edit_2_outline,
-                                            color: AppColors.red,
-                                          ).clickable(ontap: () {
-                                            Get.dialog(
-                                              DialogWidget(
-                                                child: LocataireForm(
-                                                  locataire: loc,
-                                                  onSave: fetchData,
+                                      DataCell(
+                                        Row(
+                                          spacing: 10,
+                                          children: [
+                                            const Icon(
+                                              Iconsax.edit_2_outline,
+                                              color: AppColors.red,
+                                            ).clickable(ontap: () {
+                                              Get.dialog(
+                                                DialogWidget(
+                                                  child: LocataireForm(
+                                                    locataire: locataire,
+                                                    onSave: fetchData,
+                                                  ),
                                                 ),
-                                              ),
-                                            );
-                                          }),
-                                          const Icon(
-                                            Iconsax.trash_outline,
-                                          ).clickable(ontap: () {
-                                            EasyLoading.showError('delete');
-                                          })
-                                        ],
-                                      )
-                                          // PopupMenuButton(
-                                          //   shape: RoundedRectangleBorder(
-                                          //       borderRadius:
-                                          //           BorderRadius.circular(10)),
-                                          //   itemBuilder: (context) => [
-                                          //     const PopupMenuItem(
-                                          //         value: 'edit',
-                                          //         child: Text('Modifier')),
-                                          //     const PopupMenuItem(
-                                          //         value: 'delete',
-                                          //         child: Text('Supprimer')),
-                                          //     const PopupMenuItem(
-                                          //         value: 'details',
-                                          //         child: Text('Détails')),
-                                          //   ],
-                                          //   onSelected: (value) {
-                                          //     if (value == 'details') {
-                                          //       Get.to(() => LocataireDetails(
-                                          //           locataire: loc));
-                                          //     }
-                                          //   },
-                                          // ),
-                                          ),
+                                              );
+                                            }),
+                                            const Icon(
+                                              Iconsax.trash_outline,
+                                            ).clickable(
+                                                ontap: () =>
+                                                    deleteLocataire(locataire))
+                                          ],
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 )
@@ -188,23 +213,18 @@ class _LocataireViewState extends State<LocataireView> {
                 GestureDetector(
                   onTap: () => Get.dialog(
                     Dialog(
-                        child: LocataireForm(
-                      onSave: () => fetchData(),
-                    )),
-                  ),
-                  child: Container(
-                    height: 40,
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Center(
-                      child: Text(
-                        "Nouveau",
-                        style: TextStyle(color: Colors.white),
+                      child: LocataireForm(
+                        onSave: () => fetchData(),
                       ),
                     ),
+                  ),
+                  child: MyButton.icon(
+                    icon: Icons.add,
+                    onPressed: _showForm,
+                    label: 'Nouveau',
+                    borderSize: 50,
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: AppColors.primaryLight,
                   ),
                 ),
               ],
@@ -220,7 +240,7 @@ class _LocataireViewState extends State<LocataireView> {
                       itemCount: locataires.length,
                       separatorBuilder: (_, __) => const SizedBox(height: 8),
                       itemBuilder: (context, index) {
-                        final loc = locataires[index];
+                        final locataire = locataires[index];
                         return Container(
                           decoration: BoxDecoration(
                             color: AppColors.cardBackground,
@@ -234,34 +254,42 @@ class _LocataireViewState extends State<LocataireView> {
                             ],
                           ),
                           child: ListTile(
-                            onTap: () =>
-                                Get.to(() => LocataireDetails(locataire: loc)),
+                            onTap: () => Get.to(
+                              () => LocataireDetails(locataire: locataire),
+                              curve: Curves.bounceInOut,
+                              transition: Transition.zoom,
+                            ),
                             leading: const CircleAvatar(
                               backgroundColor: AppColors.primaryLight,
                               child: Icon(Iconsax.user_outline,
                                   color: AppColors.primary),
                             ),
                             title: Text(
-                              loc.nom,
+                              locataire.nom,
                               style:
                                   const TextStyle(fontWeight: FontWeight.bold),
                             ),
-                            subtitle: Text(loc.email),
+                            subtitle: Text(locataire.email),
                             trailing: PopupMenuButton(
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10)),
-                              itemBuilder: (context) => const [
+                              itemBuilder: (context) => [
                                 PopupMenuItem(
-                                    value: 'edit', child: Text('Modifier')),
+                                    value: 'edit',
+                                    child: const Text('Modifier'),
+                                    onTap: () => _showForm(locataire)),
                                 PopupMenuItem(
-                                    value: 'delete', child: Text('Supprimer')),
-                                PopupMenuItem(
+                                  value: 'delete',
+                                  child: const Text('Supprimer'),
+                                  onTap: () => deleteLocataire(locataire),
+                                ),
+                                const PopupMenuItem(
                                     value: 'details', child: Text('Détails')),
                               ],
                               onSelected: (value) {
                                 if (value == 'details') {
-                                  Get.to(
-                                      () => LocataireDetails(locataire: loc));
+                                  Get.to(() =>
+                                      LocataireDetails(locataire: locataire));
                                 }
                               },
                             ),

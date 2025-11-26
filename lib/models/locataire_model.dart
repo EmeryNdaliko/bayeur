@@ -1,5 +1,6 @@
 import 'package:bayer/costante/export.dart';
 import 'package:bayer/main.dart';
+import 'package:bayer/services/sqlite_manager.dart';
 
 class LocataireModel {
   int? id;
@@ -9,6 +10,8 @@ class LocataireModel {
   String adresse = '';
   // TypeUser type = TypeUser.locataire;
   LocataireModel();
+
+  SqliteManager db = SqliteManager();
 
   LocataireModel.build({
     this.id,
@@ -41,15 +44,80 @@ class LocataireModel {
     };
   }
 
-  Future<void> insert() async {
-    EasyLoading.show(
-        status: 'Patientez...', maskType: EasyLoadingMaskType.black);
-    var success = await api.postData('locataire/insert', toJson());
-    logger.i(toJson());
-    if (success) {
-      EasyLoading.showSuccess('Ajout du locataire reussi');
-    } else {
-      EasyLoading.showError('Echec d\'ajout du locataire');
+  Future<bool> insert() async {
+    try {
+      SqliteManager db = SqliteManager();
+
+      EasyLoading.show(
+          status: 'Patientez...', maskType: EasyLoadingMaskType.black);
+      // var success = await api.postData('locataire/insert', toJson());
+      var success = await db.insert('locataires', toJson());
+
+      if (success > 0) {
+        return true;
+      } else {
+        return false;
+      }
+    } on Exception catch (e) {
+      EasyLoading.showError('Erreur : $e');
+      logger.e(e);
+      return false;
+    } finally {
+      EasyLoading.dismiss();
+    }
+  }
+
+  Future<bool> update() async {
+    try {
+      SqliteManager db = SqliteManager();
+
+      EasyLoading.show(
+          status: 'Patientez...', maskType: EasyLoadingMaskType.black);
+      // var success = await api.postData('locataire/insert', toJson());
+      var success = await db.update(
+        table: 'locataires',
+        values: toJson(),
+        where: 'locataire_id =?',
+        whereArgs: [id],
+      );
+
+      if (success > 0) {
+        return true;
+      } else {
+        return false;
+      }
+    } on Exception catch (e) {
+      EasyLoading.showError('Erreur : $e');
+      logger.e(e);
+      return false;
+    } finally {
+      EasyLoading.dismiss();
+    }
+  }
+
+  Future<bool> delete() async {
+    try {
+      EasyLoading.show(
+          status: 'Patientez...', maskType: EasyLoadingMaskType.black);
+      // var success = await api.postData('locataire/insert', toJson());
+      var success = await db.delete(
+        table: 'locataires',
+        where: 'locataire_id =?',
+        whereArgs: [id],
+      );
+
+      if (success > 0) {
+        logger.t("suppression : $success");
+        return true;
+      } else {
+        return false;
+      }
+    } on Exception catch (e) {
+      EasyLoading.showError('Erreur : $e');
+      logger.e(e);
+      return false;
+    } finally {
+      EasyLoading.dismiss();
     }
   }
 }

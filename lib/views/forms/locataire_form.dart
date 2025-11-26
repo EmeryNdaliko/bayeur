@@ -40,17 +40,30 @@ class _LocataireFormState extends State<LocataireForm> {
       return;
     }
 
+    var now = DateTime.now();
+
     final locataire = LocataireModel.build(
+      id: widget.locataire == null
+          ? now.day + now.hashCode
+          : widget.locataire!.id,
       nom: nomController.text.trim(),
       email: emailController.text.trim(),
       password: passwordController.text.trim(),
       adresse: adresseController.text.trim(),
     );
     if (widget.locataire == null) {
-      locataire.insert();
-      Get.back();
-      widget.onSave();
-    } else {}
+      if (await locataire.insert()) {
+        EasyLoading.showSuccess('Ajout du locataire reussi');
+        Get.back();
+        widget.onSave();
+      }
+    } else {
+      if (await locataire.update()) {
+        EasyLoading.showSuccess('Modification du locataire réussi');
+        Get.back();
+        widget.onSave();
+      }
+    }
   }
 
   @override
@@ -63,6 +76,7 @@ class _LocataireFormState extends State<LocataireForm> {
             height: 10,
           ),
           Text(
+            textAlign: TextAlign.center,
             widget.locataire == null
                 ? "Nouveau Locataire"
                 : "Modifier le locataire",
@@ -119,13 +133,33 @@ class _LocataireFormState extends State<LocataireForm> {
                         isDense: true,
                         border: OutlineInputBorder()),
                   ),
-                  MyButton(
-                    borderSize: 50,
-                    spacing: 10,
-                    label: 'Entregistrer',
-                    icon: Icons.check,
+                  const Spacer(),
+                  GestureDetector(
                     onTap: onSubmit,
+                    child: Container(
+                      width: double.infinity,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Center(
+                          child: Text(
+                        'Enregister',
+                        style: TextStyle(
+                            color: AppColors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400),
+                      )),
+                    ),
                   ),
+                  // MyButton(
+                  //   borderSize: 50,
+                  //   spacing: 10,
+                  //   label: 'Entregistrer',
+                  //   icon: Icons.check,
+                  //   onTap: onSubmit,
+                  // ),
                 ],
               ),
             ),

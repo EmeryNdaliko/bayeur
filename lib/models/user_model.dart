@@ -1,5 +1,5 @@
 enum TypeUser {
-  bayeur,
+  proprietaire,
   locataire,
 }
 
@@ -21,17 +21,17 @@ class UserModel {
 
   factory UserModel.fromJson(Map<String, dynamic> data) {
     return UserModel.build(
-        id: data['id'],
-        userNme: data['userNme'] ?? '',
+        id: data['user_id'],
+        userNme: data['user_name'] ?? '',
         email: data['email'] ?? '',
         password: data['password'] ?? '',
-        type: TypeUser.values.byName(data['type']));
+        type: TypeUser.values.byName(data['type_user']));
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'userNme': userNme,
+      'user_name': userNme,
       'email': email,
       'password': password,
       'type': type.name,

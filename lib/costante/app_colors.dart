@@ -23,4 +23,6 @@ class AppColors {
   static const Color warning = Color(0xFFFFC107); // Retard de paiement
   static const Color error = Color(0xFFF44336); // Erreur ou impayé
   static const Color red = Colors.red; //
+  static const Color blue = Colors.blue; //
+  static const Color black = Colors.black; //
 }

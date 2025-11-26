@@ -21,97 +21,94 @@ class _PropertyFormState extends State<PropertyForm> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 500,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          // crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 5,
-          children: [
-            const BarreWidget(),
-            const Text(
-              'Nouvelle propriété',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const Divider(),
-            Wrap(
-              runSpacing: 5,
-              spacing: 5,
-              children: TypePropriete.values
-                  .map((e) => InputChip(
-                        selectedColor: AppColors.primary,
-                        checkmarkColor:
-                            selectedIndex == TypePropriete.values.indexOf(e)
-                                ? AppColors.background
-                                : null,
-                        selected:
-                            selectedIndex == TypePropriete.values.indexOf(e),
-                        label: Text(
-                          e.name.substring(0, 1).toUpperCase() +
-                              e.name.substring(1),
-                          style: TextStyle(
-                              color: selectedIndex ==
-                                      TypePropriete.values.indexOf(e)
-                                  ? AppColors.background
-                                  : null),
-                        ),
-                        onPressed: () {
-                          onSeleceted(TypePropriete.values.indexOf(e));
-                          setState(() {
-                            selectedProperty = e.name;
-                          });
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        // crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 5,
+        children: [
+          const BarreWidget(),
+          const Text(
+            'Nouvelle propriété',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const Divider(),
+          Wrap(
+            runSpacing: 5,
+            spacing: 5,
+            children: TypePropriete.values
+                .map((e) => InputChip(
+                      selectedColor: AppColors.primary,
+                      checkmarkColor:
+                          selectedIndex == TypePropriete.values.indexOf(e)
+                              ? AppColors.background
+                              : null,
+                      selected:
+                          selectedIndex == TypePropriete.values.indexOf(e),
+                      label: Text(
+                        e.name.substring(0, 1).toUpperCase() +
+                            e.name.substring(1),
+                        style: TextStyle(
+                            color:
+                                selectedIndex == TypePropriete.values.indexOf(e)
+                                    ? AppColors.background
+                                    : null),
+                      ),
+                      onPressed: () {
+                        onSeleceted(TypePropriete.values.indexOf(e));
+                        setState(() {
+                          selectedProperty = e.name;
+                        });
 
-                          print(e.name);
-                        },
-                      ))
-                  .toList(),
+                        print(e.name);
+                      },
+                    ))
+                .toList(),
+          ),
+          const TextField(
+            decoration: InputDecoration(
+              isDense: true,
+              hint: Text('Surface'),
+              border: OutlineInputBorder(),
             ),
-            const TextField(
-              decoration: InputDecoration(
-                isDense: true,
-                hint: Text('Surface'),
-                border: OutlineInputBorder(),
-              ),
+          ),
+          const TextField(
+            decoration: InputDecoration(
+              isDense: true,
+              hint: Text('Nombre de chambre'),
+              border: OutlineInputBorder(),
             ),
-            const TextField(
-              decoration: InputDecoration(
-                isDense: true,
-                hint: Text('Nombre de chambre'),
-                border: OutlineInputBorder(),
-              ),
+          ),
+          const TextField(
+            decoration: InputDecoration(
+              isDense: true,
+              hint: Text('Adresse'),
+              border: OutlineInputBorder(),
             ),
-            const TextField(
-              decoration: InputDecoration(
-                isDense: true,
-                hint: Text('Adresse'),
-                border: OutlineInputBorder(),
+          ),
+          const Spacer(),
+          GestureDetector(
+            onTap: () {
+              EasyLoading.showToast('Ajout propriété');
+            },
+            child: Container(
+              width: double.infinity,
+              height: 40,
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(20),
               ),
+              child: const Center(
+                  child: Text(
+                'Enregister',
+                style: TextStyle(
+                    color: AppColors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400),
+              )),
             ),
-            const Spacer(),
-            GestureDetector(
-              onTap: () {
-                EasyLoading.showToast('Ajout propriété');
-              },
-              child: Container(
-                width: double.infinity,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Center(
-                    child: Text(
-                  'Enregister',
-                  style: TextStyle(
-                      color: AppColors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400),
-                )),
-              ),
-            )
-          ],
-        ),
+          )
+        ],
       ),
     );
   }

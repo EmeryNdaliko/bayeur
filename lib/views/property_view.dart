@@ -1,4 +1,5 @@
 import 'package:bayer/views/forms/property_form.dart';
+import 'package:bayer/widget/dialog_widget.dart';
 import 'package:bayer/widget/search_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:bayer/costante/app_colors.dart';
@@ -26,7 +27,7 @@ class _PropertyViewState extends State<PropertyView> {
               cursor: SystemMouseCursors.click,
               child: GestureDetector(
                 onTap: () {
-                  Get.dialog(const Dialog(
+                  Get.dialog(const DialogWidget(
                     child: PropertyForm(),
                   ));
                 },

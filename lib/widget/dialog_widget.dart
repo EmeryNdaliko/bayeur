@@ -13,7 +13,8 @@ class _DialogWidgetState extends State<DialogWidget> {
   Widget build(BuildContext context) {
     return Dialog(
       child: SizedBox(
-        width: 500,
+        // width: 500,
+        height: 500,
         child: widget.child,
       ),
     );

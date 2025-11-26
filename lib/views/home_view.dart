@@ -2,12 +2,11 @@ import 'package:bayer/costante/app_colors.dart';
 import 'package:bayer/costante/extension.dart';
 import 'package:bayer/rensponsive/rensponsive.dart';
 import 'package:bayer/views/locataire/locataire_view.dart';
-import 'package:bayer/views/owner_dashboard.dart';
+import 'package:bayer/views/dashboard.dart';
 import 'package:bayer/views/profil_view.dart';
 import 'package:bayer/views/property_view.dart';
 import 'package:bayer/views/setting_view.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:icons_plus/icons_plus.dart';
 
@@ -37,11 +36,6 @@ class _HomeViewState extends State<HomeView> {
           'icon': Iconsax.building_3_outline,
         },
         {
-          'widget': const SettingView(),
-          'title': 'Paramètres',
-          'icon': Iconsax.setting_2_outline,
-        },
-        {
           'widget': const ProfilView(),
           'title': 'Profil',
           'icon': Iconsax.user_outline,
@@ -55,52 +49,49 @@ class _HomeViewState extends State<HomeView> {
           body: Padding(
               padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
               child: Column(children: [
-                Container(
-                  // color: AppColors.success,
-                  // height: 30,
-                  child: Row(
-                    children: [
-                      const Text(
-                        '[ Bayeur ]',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
+                Row(
+                  children: [
+                    const Text(
+                      '[ Bayeur ]',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
                       ),
-                      const SizedBox(width: 80),
-                      ...List.generate(
-                          pages.length,
-                          (index) => Container(
-                                width: 120,
-                                padding: const EdgeInsets.all(2),
-                                // margin: EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                    color: currentIndex == index
-                                        ? AppColors.primaryLight
-                                        : null,
-                                    borderRadius: BorderRadius.circular(20)),
-                                child: Row(
-                                  children: [
-                                    5.width,
-                                    Icon(
-                                      pages[index]['icon'],
-                                      size: 15,
-                                    ),
-                                    5.width,
-                                    Text(
-                                      pages[index]['title'],
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: AppColors.primary),
-                                    ).clickable(
-                                        ontap: () => setState(
-                                            () => currentIndex = index)),
-                                  ],
-                                ),
-                              )),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(width: 80),
+                    ...List.generate(
+                        pages.length,
+                        (index) => Container(
+                              width: 120,
+                              padding: const EdgeInsets.all(2),
+                              // margin: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                  color: currentIndex == index
+                                      ? AppColors.primaryLight
+                                      : null,
+                                  borderRadius: BorderRadius.circular(20)),
+                              child: Row(
+                                children: [
+                                  5.width,
+                                  Icon(
+                                    pages[index]['icon'],
+                                    size: 15,
+                                  ),
+                                  5.width,
+                                  Text(
+                                    pages[index]['title'],
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.primary),
+                                  ).clickable(
+                                      ontap: () =>
+                                          setState(() => currentIndex = index)),
+                                ],
+                              ),
+                            )),
+                  ],
                 ),
+                const Divider(),
                 const SizedBox(
                   height: 10,
                 ),
@@ -118,32 +109,73 @@ class _HomeViewState extends State<HomeView> {
         ),
         tablet: const Scaffold(),
         mobile: Scaffold(
-            backgroundColor: AppColors.background,
-            appBar: appBar(),
-            // drawer: const MyDrawer(),
-            body: Padding(
+          backgroundColor: AppColors.background,
+          appBar: appBar(),
+          // drawer: const MyDrawer(),
+          body: Column(
+            children: [
+              Expanded(
+                  child: Padding(
                 padding:
                     const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                child: pages[currentIndex]['widget'] as Widget),
-            bottomNavigationBar: BottomNavigationBar(
-                type: BottomNavigationBarType.fixed,
-                currentIndex: currentIndex,
-                onTap: (value) {
-                  setState(() {
-                    currentIndex = value;
-                  });
-                },
-                fixedColor: AppColors.primaryLight,
-                // backgroundColor: AppColors.cardBackground,
-                backgroundColor: AppColors.primary,
-                unselectedItemColor: Colors.white,
-                elevation: 1,
-                items: List<BottomNavigationBarItem>.generate(
-                  pages.length,
-                  (index) => BottomNavigationBarItem(
-                      icon: Icon(pages[index]['icon']),
-                      label: pages[index]['title']),
-                ).toList())));
+                child: pages[currentIndex]['widget'] as Widget,
+              )),
+              Container(
+                margin: EdgeInsets.all(5),
+                height: 80,
+                color: AppColors.primaryLightAccent,
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: List.generate(
+                        pages.length, (index) => _buildButtomItem(index))),
+              )
+            ],
+          ),
+          // bottomNavigationBar: BottomNavigationBar(
+          //     type: BottomNavigationBarType.fixed,
+          //     currentIndex: currentIndex,
+          //     onTap: (value) {
+          //       setState(() {
+          //         currentIndex = value;
+          //       });
+          //     },
+          //     fixedColor: AppColors.primaryLight,
+          //     // backgroundColor: AppColors.cardBackground,
+          //     backgroundColor: AppColors.primaryLightAccent,
+          //     unselectedItemColor: AppColors.primary,
+          //     elevation: 1,
+          //     items: List<BottomNavigationBarItem>.generate(
+          //       pages.length,
+          //       (index) => BottomNavigationBarItem(
+          //           icon: CircleAvatar(child: Icon(pages[index]['icon'])),
+          //           label: pages[index]['title']),
+          //     ).toList())
+        ));
+  }
+
+  Widget _buildButtomItem(int index) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(50),
+        color: currentIndex == index ? AppColors.primaryLight : null,
+      ),
+      child: Row(
+        spacing: 10,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Icon(pages[index]['icon'] as IconData),
+          if (currentIndex == index)
+            Text(
+              pages[index]['title'] as String,
+              style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18),
+            )
+        ],
+      ),
+    ).clickable(
+        ontap: () => setState(() {
+              currentIndex = index;
+            }));
   }
 
   Column desktopSection() {
