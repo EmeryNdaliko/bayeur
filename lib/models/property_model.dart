@@ -1,3 +1,5 @@
+import 'package:bayer/costante/export.dart';
+
 enum TypePropriete {
   maison,
   appartement,
@@ -17,41 +19,55 @@ enum StatutPropriete {
 class PropertyModel {
   String? id;
   TypePropriete type = TypePropriete.maison;
+  String designation = '';
   String adresse = '';
-  double? surface;
-  int nbchambre = 0;
+  double prix = 0.0;
+  String description = '';
   StatutPropriete statut = StatutPropriete.disponible;
   DateTime? createdAt;
 
   PropertyModel();
   PropertyModel.build({
     this.id,
+    required this.designation,
     required this.type,
     required this.adresse,
-    this.surface,
+    required this.prix,
     this.statut = StatutPropriete.disponible,
-    required this.nbchambre,
+    required this.description,
     this.createdAt,
   });
 
   factory PropertyModel.fromJson(Map<String, dynamic> data) {
     return PropertyModel.build(
-        id: data['id'],
+        id: data['propriete_id'],
+        designation: data['designation'],
         type: TypePropriete.values.byName(data['type']),
         adresse: data['adresse'] ?? '',
-        nbchambre: int.tryParse(data['nbchambre'].toString()) ?? 0,
-        surface: data['surface'] ?? '',
+        description: data['nbchambre'] ?? '',
+        prix: double.tryParse(data['prix'].toString()) ?? 0.0,
         statut: StatutPropriete.values.byName(data['statut']),
-        createdAt: DateTime.tryParse(data['created']));
+        createdAt: DateTime.tryParse(data['created_at']));
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
+        'propriete_id': id,
+        'designation': designation,
         'type': type.name,
         'adresse': adresse,
-        'surface': surface,
-        'nbchambre': nbchambre,
+        'prix': prix,
+        'description': description,
         'statut': statut.name,
-        'created': createdAt
+        'created_at': createdAt?.toIso8601String()
       };
+
+  Future<bool> insert() async {
+    final SqliteManager database = SqliteManager();
+    var result = await database.insert('proprietes', toJson());
+
+    if (result > 0) {
+      return true;
+    }
+    return false;
+  }
 }

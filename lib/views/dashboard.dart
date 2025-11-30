@@ -1,6 +1,5 @@
 import 'package:bayer/costante/export.dart';
 import 'package:bayer/widget/dialog_widget.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -17,9 +16,21 @@ class _DashboardState extends State<Dashboard> {
   Future<void> initialise() async {
     await database.query('locataires').then(
       (value) {
-        setState(() {
-          locataires = value.length;
-        });
+        if (mounted) {
+          setState(() {
+            locataires = value.length;
+          });
+        }
+      },
+    );
+
+    await database.query('proprietes').then(
+      (value) {
+        if (mounted) {
+          setState(() {
+            properties = value.length;
+          });
+        }
       },
     );
   }
@@ -33,19 +44,22 @@ class _DashboardState extends State<Dashboard> {
   @override
   Widget build(BuildContext context) {
     return Rensponsive(
-      desktop: Scaffold(
-        body: Column(
+      desktop: Container(
+        padding: const EdgeInsets.only(top: 30),
+        decoration: BoxDecoration(
+            color: AppColors.white, borderRadius: BorderRadius.circular(20)),
+        child: Column(
           children: [
             "Bonjour Emery Ndaliko !"
                 .textColor(size: 25, fontweight: FontWeight.w900),
             "Nous sommes ravis de vous revoir!".textColor(size: 18),
             30.height,
             Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                  color: AppColors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: AppColors.primaryLight)),
-              height: 150,
+                  color: AppColors.primaryLightAccent,
+                  borderRadius: BorderRadius.circular(10)),
               child: Row(
                 children: [
                   Expanded(
@@ -54,7 +68,7 @@ class _DashboardState extends State<Dashboard> {
                       children: [
                         'Locataire'
                             .textColor(fontweight: FontWeight.w900, size: 14),
-                        '$locataires'
+                        '00$locataires'
                             .textColor(fontweight: FontWeight.w900, size: 30)
                       ],
                     ),
@@ -69,7 +83,8 @@ class _DashboardState extends State<Dashboard> {
                       children: [
                         'Propriété'
                             .textColor(fontweight: FontWeight.w900, size: 14),
-                        '400k'.textColor(fontweight: FontWeight.w900, size: 30)
+                        '00$properties'
+                            .textColor(fontweight: FontWeight.w900, size: 30)
                       ],
                     ),
                   ),
@@ -90,19 +105,8 @@ class _DashboardState extends State<Dashboard> {
                 ],
               ),
             ),
-            const SizedBox(
-                height: 200,
-                child: SfCartesianChart(
-                  annotations: <CartesianChartAnnotation>[
-                    CartesianChartAnnotation(
-                      xAxisName: 'kkkkokokok',
-                      widget: Center(child: Text('')),
-                      x: 3,
-                      y: 60,
-                    ),
-                  ],
-                )),
-            const Text('data'),
+           
+
           ],
         ),
       ),

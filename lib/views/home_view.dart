@@ -36,6 +36,11 @@ class _HomeViewState extends State<HomeView> {
           'icon': Iconsax.building_3_outline,
         },
         {
+          'widget': const PropertyView(),
+          'title': 'Location',
+          'icon': Iconsax.location_outline,
+        },
+        {
           'widget': const ProfilView(),
           'title': 'Profil',
           'icon': Iconsax.user_outline,
@@ -45,67 +50,83 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     return Rensponsive(
-        desktop: Scaffold(
-          body: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
-              child: Column(children: [
-                Row(
-                  children: [
-                    const Text(
-                      '[ Bayeur ]',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
+        desktop: Container(
+          width: 100,
+          child: Scaffold(
+            body: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+                child: Row(children: [
+                  Column(
+                    spacing: 8,
+                    children: [
+                      DrawerHeader(
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              width: 100,
+                              height: 100,
+                              child:
+                                  Image.asset('assets/images/logo-bayeur4.png'),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 80),
-                    ...List.generate(
-                        pages.length,
-                        (index) => Container(
-                              width: 120,
-                              padding: const EdgeInsets.all(2),
-                              // margin: EdgeInsets.all(10),
-                              decoration: BoxDecoration(
+                      const SizedBox(width: 80),
+                      ...List.generate(
+                          pages.length,
+                          (index) => Container(
+                                width: 120,
+                                height: 30,
+                                padding: const EdgeInsets.all(2),
+                                // margin: EdgeInsets.all(10),
+                                decoration: BoxDecoration(
                                   color: currentIndex == index
                                       ? AppColors.primaryLight
                                       : null,
-                                  borderRadius: BorderRadius.circular(20)),
-                              child: Row(
-                                children: [
-                                  5.width,
-                                  Icon(
-                                    pages[index]['icon'],
-                                    size: 15,
-                                  ),
-                                  5.width,
-                                  Text(
-                                    pages[index]['title'],
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.primary),
-                                  ).clickable(
-                                      ontap: () =>
-                                          setState(() => currentIndex = index)),
-                                ],
-                              ),
-                            )),
-                  ],
-                ),
-                const Divider(),
-                const SizedBox(
-                  height: 10,
-                ),
-                Expanded(
-                  child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryLightAccent,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: pages[currentIndex]['widget'] as Widget,
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                child: Row(
+                                  children: [
+                                    5.width,
+                                    Icon(
+                                      pages[index]['icon'],
+                                      size: 20,
+                                    ),
+                                    5.width,
+                                    Text(
+                                      pages[index]['title'],
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.black,
+                                      ),
+                                    ).clickable(
+                                        ontap: () => setState(
+                                            () => currentIndex = index)),
+                                  ],
+                                ),
+                              )),
+                    ],
                   ),
-                )
-              ])),
+                  const SizedBox(width: 10),
+                  // const Divider(),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(16.0),
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryLightAccent,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: pages[currentIndex]['widget'] as Widget,
+                    ),
+                  )
+                ])),
+          ),
         ),
         tablet: const Scaffold(),
         mobile: Scaffold(
@@ -121,7 +142,7 @@ class _HomeViewState extends State<HomeView> {
                 child: pages[currentIndex]['widget'] as Widget,
               )),
               Container(
-                margin: EdgeInsets.all(5),
+                margin: const EdgeInsets.all(5),
                 height: 80,
                 color: AppColors.primaryLightAccent,
                 child: Row(
@@ -155,7 +176,7 @@ class _HomeViewState extends State<HomeView> {
 
   Widget _buildButtomItem(int index) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(50),
         color: currentIndex == index ? AppColors.primaryLight : null,
@@ -168,7 +189,7 @@ class _HomeViewState extends State<HomeView> {
           if (currentIndex == index)
             Text(
               pages[index]['title'] as String,
-              style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18),
+              style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18),
             )
         ],
       ),

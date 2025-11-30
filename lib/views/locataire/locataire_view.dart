@@ -78,126 +78,123 @@ class _LocataireViewState extends State<LocataireView> {
   @override
   Widget build(BuildContext context) {
     return Rensponsive(
-      desktop: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            /// --- En-tête avec barre de recherche et bouton ---
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                SizedBox(
-                    width: 300,
-                    child: SearchField(
-                      controller: searchController,
-                    )),
-                const SizedBox(width: 10),
-                MyButton(
-                  label: "Nouveau locataire",
-                  showIcon: false,
-                  width: 200,
-                  borderSize: 50,
-                  onTap: () => Get.dialog(DialogWidget(
-                      child: LocataireForm(
-                    onSave: fetchData,
-                  ))),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 20),
-
-            /// --- Tableau ou État vide ---
-            Expanded(
-              child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : locataires.isEmpty
-                      ? const EmptyState(title: 'Aucun locataire trouvé')
-                      : Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: DataTable2(
-                            minWidth: 900,
-                            columnSpacing: 16,
-                            horizontalMargin: 16,
-                            dividerThickness: 1,
-                            headingRowColor: WidgetStateProperty.all(
-                                AppColors.primaryLight.withAlpha(20)),
-                            headingTextStyle: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(
-                                  fontWeight: FontWeight.w900,
-                                  color: AppColors.primary,
-                                ),
-                            dataRowHeight: 40,
-                            columns: const [
-                              DataColumn2(label: Text('Noms')),
-                              DataColumn2(label: Text('Email')),
-                              DataColumn2(label: Text('Adresse')),
-                              DataColumn2(label: Text('Téléphone')),
-                              DataColumn2(label: Text('Actions')),
-                            ],
-                            rows: locataires
-                                .map(
-                                  (locataire) => DataRow2(
-                                    onTap: () => Get.to(() =>
-                                        LocataireDetails(locataire: locataire)),
-                                    cells: [
-                                      DataCell(Row(
+      desktop: Column(
+        children: [
+          /// --- En-tête avec barre de recherche et bouton ---
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              SizedBox(
+                  width: 300,
+                  child: SearchField(
+                    controller: searchController,
+                  )),
+              const SizedBox(width: 10),
+              MyButton(
+                label: "Nouveau locataire",
+                showIcon: false,
+                width: 200,
+                borderSize: 50,
+                onTap: () => Get.dialog(DialogWidget(
+                    child: LocataireForm(
+                  onSave: fetchData,
+                ))),
+              ),
+            ],
+          ),
+      
+          const SizedBox(height: 20),
+      
+          /// --- Tableau ou État vide ---
+          Expanded(
+            child: isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : locataires.isEmpty
+                    ? const EmptyState(title: 'Aucun locataire trouvé')
+                    : Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: DataTable2(
+                          minWidth: 900,
+                          columnSpacing: 16,
+                          horizontalMargin: 16,
+                          dividerThickness: 1,
+                          headingRowColor: WidgetStateProperty.all(
+                              AppColors.primaryLight.withAlpha(20)),
+                          headingTextStyle: Theme.of(context)
+                              .textTheme
+                              .bodyMedium!
+                              .copyWith(
+                                fontWeight: FontWeight.w900,
+                                color: AppColors.primary,
+                              ),
+                          dataRowHeight: 40,
+                          columns: const [
+                            DataColumn2(label: Text('Noms')),
+                            DataColumn2(label: Text('Email')),
+                            DataColumn2(label: Text('Adresse')),
+                            DataColumn2(label: Text('Téléphone')),
+                            DataColumn2(label: Text('Actions')),
+                          ],
+                          rows: locataires
+                              .map(
+                                (locataire) => DataRow2(
+                                  onTap: () => Get.to(() =>
+                                      LocataireDetails(locataire: locataire)),
+                                  cells: [
+                                    DataCell(Row(
+                                      spacing: 10,
+                                      children: [
+                                        CircleAvatar(
+                                          backgroundColor:
+                                              AppColors.primaryLightAccent,
+                                          child: Text(
+                                              (locataires.indexOf(locataire) +
+                                                      1)
+                                                  .toString()),
+                                        ).size(30, 30),
+                                        Text(locataire.nom.firstMaj()),
+                                      ],
+                                    )),
+                                    DataCell(Text(locataire.email)),
+                                    DataCell(
+                                        Text(locataire.adresse.firstMaj())),
+                                    const DataCell(Text('Aucun numéro')),
+                                    DataCell(
+                                      Row(
                                         spacing: 10,
                                         children: [
-                                          CircleAvatar(
-                                            backgroundColor:
-                                                AppColors.primaryLightAccent,
-                                            child: Text(
-                                                (locataires.indexOf(locataire) +
-                                                        1)
-                                                    .toString()),
-                                          ).size(30, 30),
-                                          Text(locataire.nom.firstMaj()),
-                                        ],
-                                      )),
-                                      DataCell(Text(locataire.email)),
-                                      DataCell(
-                                          Text(locataire.adresse.firstMaj())),
-                                      const DataCell(Text('Aucun numéro')),
-                                      DataCell(
-                                        Row(
-                                          spacing: 10,
-                                          children: [
-                                            const Icon(
-                                              Iconsax.edit_2_outline,
-                                              color: AppColors.red,
-                                            ).clickable(ontap: () {
-                                              Get.dialog(
-                                                DialogWidget(
-                                                  child: LocataireForm(
-                                                    locataire: locataire,
-                                                    onSave: fetchData,
-                                                  ),
+                                          const Icon(
+                                            Iconsax.edit_2_outline,
+                                            color: AppColors.red,
+                                          ).clickable(ontap: () {
+                                            Get.dialog(
+                                              DialogWidget(
+                                                child: LocataireForm(
+                                                  locataire: locataire,
+                                                  onSave: fetchData,
                                                 ),
-                                              );
-                                            }),
-                                            const Icon(
-                                              Iconsax.trash_outline,
-                                            ).clickable(
-                                                ontap: () =>
-                                                    deleteLocataire(locataire))
-                                          ],
-                                        ),
+                                              ),
+                                            );
+                                          }),
+                                          const Icon(
+                                            Iconsax.trash_outline,
+                                          ).clickable(
+                                              ontap: () =>
+                                                  deleteLocataire(locataire))
+                                        ],
                                       ),
-                                    ],
-                                  ),
-                                )
-                                .toList(),
-                          ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                              .toList(),
                         ),
-            ),
-          ],
-        ),
+                      ),
+          ),
+        ],
       ),
 
       /// --- Version mobile ---

@@ -26,3 +26,6 @@ export 'package:data_table_2/data_table_2.dart';
 export 'package:bayer/services/api.dart';
 export 'package:bayer/services/sqlite_manager.dart';
 export 'package:logger/logger.dart';
+
+
+export 'package:uuid/uuid.dart';

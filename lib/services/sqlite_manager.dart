@@ -44,21 +44,18 @@ class SqliteManager {
     _db = await openDatabase(
       dbPath,
       version: version,
+      onConfigure: (db) async {
+        await db.execute('''PRAGMA foreign_keys = ON''');
+      },
       onCreate: (db, ver) async {
-        // await db.execute('''
-        //   CREATE TABLE IF NOT EXISTS example (
-        //     id INTEGER PRIMARY KEY AUTOINCREMENT,
-        //     name TEXT,
-        //     value INTEGER
-        //   );
-        // ''');
         await db.execute('''
             CREATE TABLE IF NOT EXISTS locataires (
-              locataire_id int NOT NULL ,
+              locataire_id TEXT PRIMARY KEY,
               nom varchar(100) NOT NULL,
               email varchar(100) NOT NULL,
               password varchar(255) NOT NULL,
               adresse varchar(255),
+              telephone varchar(50),
               created_at timestamp NULL DEFAULT CURRENT_TIMESTAMP,
               updated_at timestamp NULL DEFAULT CURRENT_TIMESTAMP
               )
@@ -66,12 +63,66 @@ class SqliteManager {
 
         await db.execute('''
             CREATE TABLE IF NOT EXISTS users (
-              user_id varchar(100) NOT NULL,
+              user_id TEXT PRIMARY KEY,
               user_name varchar(255) NOT NULL,
               email varchar(100) NOT NULL,
               password varchar(255) NOT NULL,             
               created_at timestamp NULL DEFAULT CURRENT_TIMESTAMP,
               updated_at timestamp NULL DEFAULT CURRENT_TIMESTAMP
+              )
+              ''');
+        await db.execute('''
+            CREATE TABLE IF NOT EXISTS proprietes (
+              propriete_id TEXT PRIMARY KEY,
+              designation varchar(255) NOT NULL,
+              type varchar(255) NOT NULL,
+              adresse varchar(255) NOT NULL,             
+              statut varchar(255) NOT NULL,             
+              prix DECIMAL(10,2) NOT NULL,
+              description varchar(255) NOT NULL,           
+              created_at timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+              updated_at timestamp NULL DEFAULT CURRENT_TIMESTAMP
+              )
+              ''');
+
+        await db.execute('''
+              CREATE TABLE IF NOT EXISTS location ( 
+              location_id TEXT PRIMARY KEY,
+              locataire_id TEXT,
+              propriete_id TEXT,
+              date_debut timestamp NOT NULL,
+              date_fin timestamp NOT NULL,
+              loyer_mensuel DECIMAL(10,2),
+              statut VARCHAR(50) DEFAULT 'Active',                       
+              created_at timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+              updated_at timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+              FOREIGN KEY (locataire_id) REFERENCES locataires(locataire_id),
+              FOREIGN KEY (propriete_id) REFERENCES proprietes(propriete_id)
+              )
+              ''');
+
+        await db.execute('''
+              CREATE TABLE IF NOT EXISTS dettes (
+              dette_id TEXT PRIMARY KEY,
+              locataire_id TEXT,
+              montant DECIMAL(10,2),
+              description TEXT,
+              statut VARCHAR(20) DEFAULT 'Non payé',                                
+              created_at timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+              updated_at timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+              FOREIGN KEY (locataire_id) REFERENCES locataire(dette_id)
+              )
+              ''');
+
+        await db.execute('''
+              CREATE TABLE IF NOT EXISTS paiements (
+              paiement_id TEXT,
+              location_id TEXT,
+              montant DECIMAL(10,2),             
+              mode_paiement VARCHAR(50),
+              created_at timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+              updated_at timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+              FOREIGN KEY (location_id) REFERENCES location(location_id)
               )
               ''');
       },

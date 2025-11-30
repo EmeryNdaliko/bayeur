@@ -1,25 +1,26 @@
 import 'package:bayer/costante/export.dart';
-import 'package:bayer/main.dart';
-import 'package:bayer/services/sqlite_manager.dart';
 
 class LocataireModel {
-  int? id;
+  var uuid = Uuid();
+  String id = '';
   String nom = '';
   String email = '';
   String password = '';
   String adresse = '';
+  String telephone = '';
   // TypeUser type = TypeUser.locataire;
   LocataireModel();
 
   SqliteManager db = SqliteManager();
+  String get generateId => uuid.v4();
 
   LocataireModel.build({
-    this.id,
+    required this.id,
     required this.nom,
     required this.email,
     required this.adresse,
     required this.password,
-    // required this.type,
+    required this.telephone,
   });
 
   factory LocataireModel.fromJson(Map<String, dynamic> data) {
@@ -28,6 +29,7 @@ class LocataireModel {
       nom: data['nom'] ?? '',
       email: data['email'] ?? '',
       adresse: data['adresse'] ?? '',
+      telephone: data['telephone'] ?? '',
       password: data['password'] ?? '',
     );
     // type: TypeUser.values.byName(data['type']));
@@ -39,6 +41,7 @@ class LocataireModel {
       'nom': nom,
       'email': email,
       'adresse': adresse,
+      'telephone': telephone,
       'password': password,
       // 'type': type.name,
     };

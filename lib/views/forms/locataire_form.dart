@@ -1,4 +1,5 @@
 import 'package:bayer/costante/export.dart';
+import 'package:bayer/views/forms/property_form.dart';
 
 class LocataireForm extends StatefulWidget {
   final LocataireModel? locataire;
@@ -18,6 +19,7 @@ class _LocataireFormState extends State<LocataireForm> {
   late TextEditingController emailController;
   late TextEditingController adresseController;
   late TextEditingController passwordController;
+  late TextEditingController telephoneController;
 
   void initialise() {
     nomController = TextEditingController(text: widget.locataire?.nom);
@@ -25,6 +27,9 @@ class _LocataireFormState extends State<LocataireForm> {
     adresseController = TextEditingController(text: widget.locataire?.adresse);
     passwordController =
         TextEditingController(text: widget.locataire?.password);
+
+    telephoneController =
+        TextEditingController(text: widget.locataire?.telephone);
   }
 
   @override
@@ -40,17 +45,13 @@ class _LocataireFormState extends State<LocataireForm> {
       return;
     }
 
-    var now = DateTime.now();
-
     final locataire = LocataireModel.build(
-      id: widget.locataire == null
-          ? now.day + now.hashCode
-          : widget.locataire!.id,
-      nom: nomController.text.trim(),
-      email: emailController.text.trim(),
-      password: passwordController.text.trim(),
-      adresse: adresseController.text.trim(),
-    );
+        id: widget.locataire == null ? uuid.v4() : widget.locataire!.id,
+        nom: nomController.text.trim(),
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+        adresse: adresseController.text.trim(),
+        telephone: telephoneController.text.trim());
     if (widget.locataire == null) {
       if (await locataire.insert()) {
         EasyLoading.showSuccess('Ajout du locataire reussi');
@@ -75,6 +76,7 @@ class _LocataireFormState extends State<LocataireForm> {
           const SizedBox(
             height: 10,
           ),
+          BarreWidget(),
           Text(
             textAlign: TextAlign.center,
             widget.locataire == null

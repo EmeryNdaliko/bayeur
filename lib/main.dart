@@ -5,6 +5,16 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 // final api = ApiHelper(baseUrl: 'http://192.168.101.1/bayeur_api');
 final api = ApiHelper(baseUrl: 'http://localhost/bayeur_api');
+
+/** TODO Splash Screen 
+ *  return AnimatedSplashScreen(
+      splash: 'images/splash.png',
+      nextScreen: MainScreen(),
+      splashTransition: SplashTransition.rotationTransition,
+      pageTransitionType: PageTransitionType.scale,
+    );
+ */
+
 Future<void> initApplication() async {
   // Initialisation widgets Flutter
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,6 +46,7 @@ final logger = Logger(
     printEmojis: true,
   ),
 );
+var uuid = const Uuid();
 
 class BayeurApp extends StatelessWidget {
   const BayeurApp({super.key});
