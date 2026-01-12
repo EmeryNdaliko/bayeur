@@ -1,14 +1,14 @@
 import '../costante/export.dart';
 
-class SearchField extends StatelessWidget {
-  const SearchField({
+class TextFieldWidget extends StatelessWidget {
+  const TextFieldWidget({
     super.key,
     this.controller,
-    this.onChanged,
+    this.icon,
   });
 
   final TextEditingController? controller;
-  final Function(String)? onChanged;
+  final IconData? icon;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -19,13 +19,12 @@ class SearchField extends StatelessWidget {
       height: 30,
       child: TextField(
         controller: controller,
-        decoration: const InputDecoration(
-          hint: Text('Rechercher'),
+        decoration: InputDecoration(
+          hint: const Text('Rechercher'),
           isDense: true,
-          prefixIcon: Icon(Icons.search),
-          border: OutlineInputBorder(borderSide: BorderSide.none),
+          prefixIcon: icon != null ? Icon(icon) : null,
+          border: const OutlineInputBorder(borderSide: BorderSide.none),
         ),
-        onChanged: onChanged,
       ),
     );
   }

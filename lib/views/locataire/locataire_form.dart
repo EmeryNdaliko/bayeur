@@ -1,5 +1,4 @@
 import 'package:bayer/costante/export.dart';
-import 'package:bayer/views/forms/property_form.dart';
 
 class LocataireForm extends StatefulWidget {
   final LocataireModel? locataire;
@@ -76,7 +75,7 @@ class _LocataireFormState extends State<LocataireForm> {
           const SizedBox(
             height: 10,
           ),
-          BarreWidget(),
+          const BarreWidget(),
           Text(
             textAlign: TextAlign.center,
             widget.locataire == null
@@ -126,6 +125,22 @@ class _LocataireFormState extends State<LocataireForm> {
                         border: OutlineInputBorder()),
                   ),
                   TextFormField(
+                    controller: telephoneController,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                      LengthLimitingTextInputFormatter(10),
+                    ],
+                    keyboardType: TextInputType.phone,
+                    validator: (value) =>
+                        value!.isEmpty ? "Entrer un numero valide" : null,
+                    decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.phone),
+                      hintText: "Telephone",
+                      isDense: true,
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  TextFormField(
                     controller: passwordController,
                     validator: (value) =>
                         value!.isEmpty ? "Entrer un mot de passe valide" : null,
@@ -135,6 +150,7 @@ class _LocataireFormState extends State<LocataireForm> {
                         isDense: true,
                         border: OutlineInputBorder()),
                   ),
+
                   const Spacer(),
                   GestureDetector(
                     onTap: onSubmit,

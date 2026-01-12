@@ -1,5 +1,4 @@
 import 'package:bayer/costante/export.dart';
-import 'package:lottie/lottie.dart';
 
 class AskYesNoWidget extends StatelessWidget {
   final Widget? child;
@@ -30,7 +29,7 @@ class AskYesNoWidget extends StatelessWidget {
       backgroundColor: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
-        padding: EdgeInsets.all(10),
+        padding: const EdgeInsets.all(10),
         width: 350,
         // height: 180,
         child: Stack(

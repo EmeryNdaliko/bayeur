@@ -8,15 +8,19 @@ export 'package:bayer/costante/extension.dart';
 export 'package:bayer/rensponsive/rensponsive.dart';
 export 'package:bayer/views/locataire/locataire_view.dart';
 export 'package:bayer/views/dashboard.dart';
-export 'package:bayer/views/property_view.dart';
+export 'package:bayer/views/property/property_view.dart';
 export 'package:bayer/views/setting_view.dart';
+
+export 'package:bayer/models/user_model.dart';
+export 'package:bayer/views/home_view.dart';
+export 'package:flutter/services.dart';
 
 export 'package:icons_plus/icons_plus.dart';
 
 export 'package:bayer/main.dart';
 export 'package:bayer/models/locataire_model.dart';
 
-export 'package:bayer/views/forms/locataire_form.dart';
+export 'package:bayer/views/locataire/locataire_form.dart';
 export 'package:bayer/views/locataire/locataire_details.dart';
 export 'package:bayer/widget/button_widget.dart';
 export 'package:bayer/widget/empty_state.dart';
@@ -29,3 +33,11 @@ export 'package:logger/logger.dart';
 
 
 export 'package:uuid/uuid.dart';
+export 'package:bayer/views/profil_view.dart';
+export 'package:bayer/views/location/location_view.dart';
+
+export 'package:bayer/costante/app_constante.dart';
+
+export 'package:lottie/lottie.dart';
+
+export 'package:bayer/views/property/property_form.dart';

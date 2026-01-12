@@ -1,6 +1,5 @@
 import 'package:bayer/costante/export.dart';
-import 'package:bayer/views/home_view.dart';
-import 'package:flutter/services.dart';
+
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -12,52 +11,74 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final TypeUser type = TypeUser.proprietaire;
 
   // Suivi de la sélection
   String _selectedRole = 'owner'; // 'owner' ou 'tenant'
+  bool showPassword = false;
+
+  void isPasswordVisible() {
+    setState(() {
+      showPassword = !showPassword;
+    });
+  }
 
   Future<void> _loginAsOwner() async {
-    if (emailController.text.isEmpty && passwordController.text.isEmpty) {
+    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
       EasyLoading.showInfo("Verifier vos informations");
       return;
     }
 
     final sqliteManager = SqliteManager();
-    var users =
-        await sqliteManager.query('users', where: 'email=?', whereArgs: [
-      emailController.text.trim(),
-    ]);
 
-    if (users.isNotEmpty) {}
+    var current = UserModel.build(
+        userNme: 'defaout',
+        email: emailController.text.trim(),
+        password: passwordController.text,
+        
+        type: type);
 
-    // Get.off(() => const HomeView()); // TODO ideal
-    Get.to(
-      () => const HomeView(),
-      curve: Curves.bounceInOut,
-      transition: Transition.zoom,
-      opaque: true,
-    );
-  }
+    List<Map> user = await sqliteManager.execute(
+        query: 'SELECT * FROM users WHERE email=? AND password=?',
+        args: [
+          emailController.text.trim(),
+          passwordController.text.trim(),
+        ]);
 
-  void _loginAsTenant() {
-    // Get.off(() => const TenantDashboard());
+    logger.i(user);
+    logger.i(current.toJson());
+
+    if (current.isDefault) {
+      Get.offAll(
+        () => const HomeView(),
+        curve: Curves.bounceInOut,
+        transition: Transition.zoom,
+        opaque: true,
+      );
+      current.connect();
+    }
+    if (user.isNotEmpty) {
+      current.connect();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Rensponsive(
-        desktop: Center(
-          child: SizedBox(width: 400, child: _loginContent()),
-        ),
-        tablet: const Center(),
-        mobile: SafeArea(
-          child: Scaffold(
-            backgroundColor: Colors.blueGrey[50],
-            body: _loginContent(),
-          ),
-        ),
-      ),
+      body: UserModel.current != null
+          ? const HomeView()
+          : Responsive(
+              desktop: Center(
+                child: SizedBox(width: 400, child: _loginContent()),
+              ),
+              tablet: const Center(),
+              mobile: SafeArea(
+                child: Scaffold(
+                  backgroundColor: Colors.blueGrey[50],
+                  body: _loginContent(),
+                ),
+              ),
+            ),
     );
   }
 
@@ -71,12 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
             SizedBox(
                 width: 100,
                 height: 100,
-                child: Image.asset('assets/images/logo.png')),
-            // const Icon(
-            //   Iconsax.login_1_outline,
-            //   size: 100,
-            //   color: Color(0xFF448AFF),
-            // ),
+                child: Image.asset('assets/images/logo2.png')),
             const SizedBox(height: 16),
             const Text(
               'Bienvenue',
@@ -92,7 +108,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 8),
             Container(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(5),
               decoration: BoxDecoration(
                 color: const Color.fromARGB(23, 4, 72, 30),
                 borderRadius: BorderRadius.circular(12),
@@ -108,12 +124,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         setState(() => _selectedRole = 'owner');
                       },
                       child: Container(
-                        height: 40,
+                        height: 35,
                         decoration: BoxDecoration(
                           color: _selectedRole == 'owner'
                               ? AppColors.primary
                               : null,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(8),
                           // border: Border.all(color: Colors.blueAccent),
                         ),
                         alignment: Alignment.center,
@@ -129,21 +145,20 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 10),
+
                   // Conteneur Locataire
                   Expanded(
                     child: GestureDetector(
                       onTap: () {
                         setState(() => _selectedRole = 'tenant');
-                        _loginAsTenant(); // appel existant
                       },
                       child: Container(
-                        height: 40,
+                        height: 35,
                         decoration: BoxDecoration(
                           color: _selectedRole == 'tenant'
                               ? AppColors.primary
                               : null,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(8),
                           // border: Border.all(color: Colors.blueAccent),
                         ),
                         alignment: Alignment.center,
@@ -164,9 +179,11 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 32),
             TextField(
+              keyboardType: TextInputType.emailAddress,
               controller: emailController,
               inputFormatters: [
                 FilteringTextInputFormatter.deny(RegExp(r'\s')),
+                FilteringTextInputFormatter.allow(RegExp(r'[a-z0-9@.]')),
               ],
               decoration: InputDecoration(
                 prefixIcon: const Icon(Iconsax.message_outline),
@@ -178,14 +195,21 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 16),
             TextField(
+              keyboardType: showPassword
+                  ? TextInputType.text
+                  : TextInputType.visiblePassword,
               controller: passwordController,
-              obscureText: true,
-              inputFormatters: [
-                // FilteringTextInputFormatter.deny(RegExp(r'\s')),
-                // FilteringTextInputFormatter.singleLineFormatter,
-                FilteringTextInputFormatter.allow(RegExp(r'[a-z0-9@.]')),
-              ],
+              obscureText: !showPassword,
+              inputFormatters: const [],
               decoration: InputDecoration(
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    showPassword
+                        ? Iconsax.eye_outline
+                        : Iconsax.eye_slash_outline,
+                  ),
+                  onPressed: isPasswordVisible,
+                ),
                 prefixIcon: const Icon(Icons.key),
                 labelText: 'Mot de passe',
                 isDense: true,

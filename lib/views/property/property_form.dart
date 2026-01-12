@@ -1,12 +1,10 @@
-import 'package:bayer/costante/app_colors.dart';
 import 'package:bayer/costante/export.dart';
 import 'package:bayer/models/property_model.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 class PropertyForm extends StatefulWidget {
   final PropertyModel? property;
-  const PropertyForm({super.key, this.property});
+  final VoidCallback onSave;
+  const PropertyForm({super.key, this.property, required this.onSave});
 
   @override
   State<PropertyForm> createState() => _PropertyFormState();
@@ -25,11 +23,13 @@ class _PropertyFormState extends State<PropertyForm> {
         TextEditingController(text: widget.property?.designation);
     prixController =
         TextEditingController(text: widget.property?.prix.toString());
-    adresseController =
-        TextEditingController(text: widget.property?.designation);
+    adresseController = TextEditingController(text: widget.property?.adresse);
     descriptionController =
         TextEditingController(text: widget.property?.description);
-    type = widget.property?.type;
+    if (widget.property != null) {
+      type = widget.property?.type;
+      selectedIndex = widget.property!.type.index;
+    }
   }
 
   @override
@@ -53,20 +53,26 @@ class _PropertyFormState extends State<PropertyForm> {
         statut: StatutPropriete.disponible,
         description: descriptionController.text.trim(),
         createdAt: DateTime.now());
-    if (await property.insert()) {
-      EasyLoading.showSuccess('Proprieté ajouté');
+
+    if (widget.property != null) {
+      if (await property.update()) {
+        EasyLoading.showSuccess('Proprieté modifié');
+        widget.onSave();
+      } else {
+        EasyLoading.showError('Impossible de mettre a jour la propriete');
+      }
+      return;
     } else {
-      EasyLoading.showError('Impossible d\'ajouter une propriete');
+      if (await property.insert()) {
+        EasyLoading.showSuccess('Proprieté ajouté');
+        widget.onSave();
+      } else {
+        EasyLoading.showError('Impossible d\'ajouter une propriete');
+      }
     }
   }
 
   int selectedIndex = 0;
-  String selectedProperty = '';
-  void onSeleceted(int index) {
-    setState(() {
-      selectedIndex = index;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,42 +85,31 @@ class _PropertyFormState extends State<PropertyForm> {
           spacing: 5,
           children: [
             const BarreWidget(),
-            const Text(
-              'Nouvelle propriété',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Text(
+              widget.property == null
+                  ? 'Nouvelle propriété'
+                  : "Modifier la propriété",
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const Divider(),
-            Wrap(
-              runSpacing: 5,
-              spacing: 5,
-              children: TypePropriete.values
-                  .map((e) => InputChip(
-                        selectedColor: AppColors.primary,
-                        checkmarkColor:
-                            selectedIndex == TypePropriete.values.indexOf(e)
-                                ? AppColors.background
-                                : null,
-                        selected:
-                            selectedIndex == TypePropriete.values.indexOf(e),
-                        label: Text(
-                          e.name.substring(0, 1).toUpperCase() +
-                              e.name.substring(1),
-                          style: TextStyle(
-                              color: selectedIndex ==
-                                      TypePropriete.values.indexOf(e)
-                                  ? AppColors.background
-                                  : null),
-                        ),
-                        onPressed: () {
-                          onSeleceted(TypePropriete.values.indexOf(e));
+            Row(
+                // runSpacing: 5,
+                spacing: 5,
+                children: List.generate(
+                    TypePropriete.values.length,
+                    (index) => ChoiceChip(
+                        selectedColor: AppColors.blue,
+                        elevation: 0,
+                        onSelected: (value) {
                           setState(() {
-                            selectedProperty = e.name;
+                            selectedIndex = index;
                           });
                         },
-                      ))
-                  .toList(),
-            ),
-            TextField(
+                        label: TypePropriete.values[index].name.text,
+                        selected: selectedIndex == index))),
+            TextFormField(
+              validator: (value) =>
+                  value!.isEmpty ? 'ce champs est requis' : null,
               controller: designationController,
               decoration: const InputDecoration(
                 isDense: true,
@@ -122,7 +117,9 @@ class _PropertyFormState extends State<PropertyForm> {
                 border: OutlineInputBorder(),
               ),
             ),
-            TextField(
+            TextFormField(
+              validator: (value) =>
+                  value!.isEmpty ? 'ce champs est requis' : null,
               controller: prixController,
               decoration: const InputDecoration(
                 isDense: true,
@@ -130,7 +127,9 @@ class _PropertyFormState extends State<PropertyForm> {
                 border: OutlineInputBorder(),
               ),
             ),
-            TextField(
+            TextFormField(
+              validator: (value) =>
+                  value!.isEmpty ? 'ce champs est requis' : null,
               controller: adresseController,
               decoration: const InputDecoration(
                 isDense: true,
@@ -138,36 +137,19 @@ class _PropertyFormState extends State<PropertyForm> {
                 border: OutlineInputBorder(),
               ),
             ),
-            TextField(
+            TextFormField(
               controller: descriptionController,
               decoration: const InputDecoration(
                 isDense: true,
-                hint: Text('Description'),
+                hint: Text('Description(facultatif)'),
                 border: OutlineInputBorder(),
               ),
             ),
             const Spacer(),
-            GestureDetector(
-              onTap: () {
-                // EasyLoading.showToast('Ajout propriété');
-                onSubmit();
-              },
-              child: Container(
-                width: double.infinity,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Center(
-                    child: Text(
-                  'Enregister',
-                  style: TextStyle(
-                      color: AppColors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400),
-                )),
-              ),
+            MyButton(
+              label: widget.property == null ? 'Enregister' : 'Modifier',
+              onTap: onSubmit,
+              borderSize: 50,
             )
           ],
         ),

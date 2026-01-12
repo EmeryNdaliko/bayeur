@@ -1,7 +1,8 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:bayer/costante/export.dart';
 
 class LocataireModel {
-  var uuid = Uuid();
+  var uuid = const Uuid();
   String id = '';
   String nom = '';
   String email = '';
@@ -35,7 +36,7 @@ class LocataireModel {
     // type: TypeUser.values.byName(data['type']));
   }
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic>  toJson() {
     return {
       'locataire_id': id,
       'nom': nom,
@@ -45,6 +46,16 @@ class LocataireModel {
       'password': password,
       // 'type': type.name,
     };
+  }
+
+  Future<List<Map<dynamic, dynamic>>> getAllPaiements() async {
+    SqliteManager db = SqliteManager();
+    return await db.execute(query: '''
+            SELECT max(montant) FROM paiements paie 
+            INNER JOIN locations 
+            ON paie.location_id=locations.location_id 
+            WHERE locations.locataire_id=? 
+            ''', args: [id]);
   }
 
   Future<bool> insert() async {
@@ -103,6 +114,30 @@ class LocataireModel {
       EasyLoading.show(
           status: 'Patientez...', maskType: EasyLoadingMaskType.black);
       // var success = await api.postData('locataire/insert', toJson());
+
+      var res = await db.execute(query: '''
+        SELECT * FROM locataires loc 
+        INNER JOIN location on location.locataire_id = loc.locataire_id 
+        INNER JOIN proprietes prop ON location.propriete_id = prop.propriete_id
+        WHERE location.locataire_id =?
+        ''', args: [id]);
+
+      if (res.isNotEmpty) {
+        logger.i(res.map((e) => e));
+
+        var context = Get.context;
+        AwesomeDialog(
+                width: 400,
+                title: 'Suppression',
+                desc: 'Erreur de supression\nCet locataire a deja une location',
+                context: context!,
+                dialogType: DialogType.error,
+                autoHide: 2.seconds)
+            .show();
+
+        return false;
+      }
+
       var success = await db.delete(
         table: 'locataires',
         where: 'locataire_id =?',
@@ -122,5 +157,15 @@ class LocataireModel {
     } finally {
       EasyLoading.dismiss();
     }
+  }
+
+  static Future<LocataireModel?> getLocataireById(String id) async {
+    var sql = SqliteManager();
+    var result =
+        await sql.query('locataires', where: 'locataire_id=?', whereArgs: [id]);
+    if (result.isNotEmpty) {
+      return LocataireModel.fromJson(result.first);
+    }
+    return null;
   }
 }

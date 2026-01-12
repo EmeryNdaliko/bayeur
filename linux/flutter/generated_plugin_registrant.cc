@@ -10,6 +10,8 @@
 #include <file_selector_linux/file_selector_plugin.h>
 #include <open_file_linux/open_file_linux_plugin.h>
 #include <printing/printing_plugin.h>
+#include <rive_native/rive_native_plugin.h>
+#include <window_size/window_size_plugin.h>
 
 void fl_register_plugins(FlPluginRegistry* registry) {
   g_autoptr(FlPluginRegistrar) file_saver_registrar =
@@ -24,4 +26,10 @@ void fl_register_plugins(FlPluginRegistry* registry) {
   g_autoptr(FlPluginRegistrar) printing_registrar =
       fl_plugin_registry_get_registrar_for_plugin(registry, "PrintingPlugin");
   printing_plugin_register_with_registrar(printing_registrar);
+  g_autoptr(FlPluginRegistrar) rive_native_registrar =
+      fl_plugin_registry_get_registrar_for_plugin(registry, "RiveNativePlugin");
+  rive_native_plugin_register_with_registrar(rive_native_registrar);
+  g_autoptr(FlPluginRegistrar) window_size_registrar =
+      fl_plugin_registry_get_registrar_for_plugin(registry, "WindowSizePlugin");
+  window_size_plugin_register_with_registrar(window_size_registrar);
 }

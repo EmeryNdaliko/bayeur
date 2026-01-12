@@ -1,3 +1,6 @@
+import 'package:bayer/costante/export.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
 class AppConstante {
   // SVG
   static String get appName => "subsure";
@@ -43,4 +46,17 @@ class AppConstante {
   static String get brouillonImg => 'assets/images/brouillon.png';
   static String get singeImg => 'assets/images/signe.png';
   static String get termineImg => 'assets/images/termine.png';
+}
+
+extension SvgExtension on String {
+  Widget toAsset({double? width, double? height}) => SvgPicture.asset(
+        this,
+        width: width,
+        height: height,
+      );
+  Widget toImage({double? width, double? height}) => Image.asset(
+        this,
+        width: width,
+        height: height,
+      );
 }

@@ -1,7 +1,4 @@
-import 'package:bayer/costante/app_constante.dart';
-import 'package:bayer/costante/extension.dart';
-import 'package:bayer/widget/button_widget.dart';
-import 'package:lottie/lottie.dart';
+
 
 import '../costante/export.dart';
 
@@ -37,11 +34,11 @@ class EmptyState extends StatelessWidget {
           Text(
             textAlign: TextAlign.center,
             title,
-            style: TextStyle(color: Colors.grey),
+            style: const TextStyle(color: Colors.grey),
           ),
           10.height,
           press == null
-              ? SizedBox()
+              ? const SizedBox()
               : SizedBox(
                   width: width ?? 200,
                   child: !showButton

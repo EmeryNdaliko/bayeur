@@ -75,7 +75,7 @@ class SqliteManager {
             CREATE TABLE IF NOT EXISTS proprietes (
               propriete_id TEXT PRIMARY KEY,
               designation varchar(255) NOT NULL,
-              type varchar(255) NOT NULL,
+              propriete_type varchar(255) NOT NULL,
               adresse varchar(255) NOT NULL,             
               statut varchar(255) NOT NULL,             
               prix DECIMAL(10,2) NOT NULL,
@@ -241,6 +241,12 @@ class SqliteManager {
       {String? where, List<Object?>? whereArgs}) async {
     final db = await open();
     return await db.query(table, where: where, whereArgs: whereArgs);
+  }
+
+  /// CRUD — query
+  Future<List<Map>> execute({required String query, List<Object>? args}) async {
+    final db = await open();
+    return await db.rawQuery(query, args);
   }
 
   /// Importer une base depuis un ZIP

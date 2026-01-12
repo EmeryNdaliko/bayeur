@@ -1,14 +1,7 @@
-import 'package:bayer/costante/app_colors.dart';
-import 'package:bayer/costante/extension.dart';
-import 'package:bayer/rensponsive/rensponsive.dart';
-import 'package:bayer/views/locataire/locataire_view.dart';
-import 'package:bayer/views/dashboard.dart';
-import 'package:bayer/views/profil_view.dart';
-import 'package:bayer/views/property_view.dart';
-import 'package:bayer/views/setting_view.dart';
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:icons_plus/icons_plus.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:bayer/costante/export.dart';
+import 'package:bayer/services/cache_manager.dart';
+import 'package:bayer/views/login_screen.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -19,6 +12,8 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   int currentIndex = 0;
+
+  /// Tableau complet des pages
   List<Map<String, dynamic>> get pages => [
         {
           'widget': const Dashboard(),
@@ -27,18 +22,23 @@ class _HomeViewState extends State<HomeView> {
         },
         {
           'widget': const LocataireView(),
-          'title': 'Locataire',
+          'title': 'Locataires',
           'icon': Iconsax.user_tag_outline,
         },
         {
           'widget': const PropertyView(),
-          'title': 'Propriété',
+          'title': 'Propriétés',
           'icon': Iconsax.building_3_outline,
         },
         {
-          'widget': const PropertyView(),
-          'title': 'Location',
+          'widget': const LocationView(),
+          'title': 'Locations',
           'icon': Iconsax.location_outline,
+        },
+        {
+          'widget': const LocationView(),
+          'title': 'Paiements',
+          'icon': Iconsax.card_add_outline,
         },
         {
           'widget': const ProfilView(),
@@ -47,174 +47,202 @@ class _HomeViewState extends State<HomeView> {
         },
       ];
 
+  /// Menus visibles dans la bottom bar mobile
+  final List<int> bottomMenuPages = [0, 1, 4];
+
+  /// Menus envoyés dans le Drawer
+  final List<int> drawerMenuPages = [2, 3];
+
   @override
   Widget build(BuildContext context) {
-    return Rensponsive(
-        desktop: Container(
-          width: 100,
-          child: Scaffold(
-            body: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
-                child: Row(children: [
-                  Column(
-                    spacing: 8,
-                    children: [
-                      DrawerHeader(
-                        child: Column(
-                          children: [
-                            SizedBox(
-                              width: 100,
-                              height: 100,
-                              child:
-                                  Image.asset('assets/images/logo-bayeur4.png'),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 80),
-                      ...List.generate(
-                          pages.length,
-                          (index) => Container(
-                                width: 120,
-                                height: 30,
-                                padding: const EdgeInsets.all(2),
-                                // margin: EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: currentIndex == index
-                                      ? AppColors.primaryLight
-                                      : null,
-                                  borderRadius: BorderRadius.circular(5),
-                                ),
-                                child: Row(
-                                  children: [
-                                    5.width,
-                                    Icon(
-                                      pages[index]['icon'],
-                                      size: 20,
-                                    ),
-                                    5.width,
-                                    Text(
-                                      pages[index]['title'],
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        color: AppColors.black,
-                                      ),
-                                    ).clickable(
-                                        ontap: () => setState(
-                                            () => currentIndex = index)),
-                                  ],
-                                ),
-                              )),
-                    ],
-                  ),
-                  const SizedBox(width: 10),
-                  // const Divider(),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.all(16.0),
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryLightAccent,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: pages[currentIndex]['widget'] as Widget,
-                    ),
-                  )
-                ])),
-          ),
-        ),
-        tablet: const Scaffold(),
-        mobile: Scaffold(
-          backgroundColor: AppColors.background,
-          appBar: appBar(),
-          // drawer: const MyDrawer(),
-          body: Column(
-            children: [
-              Expanded(
-                  child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                child: pages[currentIndex]['widget'] as Widget,
-              )),
-              Container(
-                margin: const EdgeInsets.all(5),
-                height: 80,
-                color: AppColors.primaryLightAccent,
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: List.generate(
-                        pages.length, (index) => _buildButtomItem(index))),
-              )
-            ],
-          ),
-          // bottomNavigationBar: BottomNavigationBar(
-          //     type: BottomNavigationBarType.fixed,
-          //     currentIndex: currentIndex,
-          //     onTap: (value) {
-          //       setState(() {
-          //         currentIndex = value;
-          //       });
-          //     },
-          //     fixedColor: AppColors.primaryLight,
-          //     // backgroundColor: AppColors.cardBackground,
-          //     backgroundColor: AppColors.primaryLightAccent,
-          //     unselectedItemColor: AppColors.primary,
-          //     elevation: 1,
-          //     items: List<BottomNavigationBarItem>.generate(
-          //       pages.length,
-          //       (index) => BottomNavigationBarItem(
-          //           icon: CircleAvatar(child: Icon(pages[index]['icon'])),
-          //           label: pages[index]['title']),
-          //     ).toList())
-        ));
+    return Responsive(
+      desktop: _buildDesktop(),
+      tablet: const Scaffold(),
+      mobile: _buildMobile(),
+    );
   }
 
-  Widget _buildButtomItem(int index) {
+  // ---------------------------- DESKTOP -----------------------------------
+
+  Widget _buildDesktop() {
+    return SizedBox(
+      // width: 100,
+      child: Scaffold(
+        body: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+          child: Row(
+            children: [
+              _desktopSidebar(),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryLightAccent,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: pages[currentIndex]['widget'],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _desktopSidebar() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 8,
+      children: [
+        DrawerHeader(
+          child: SizedBox(
+            width: 100,
+            height: 100,
+            child: Image.asset('assets/images/logo-bayeur4.png'),
+          ),
+        ),
+        ...List.generate(
+          pages.length,
+          (index) => Container(
+            width: 120,
+            height: 30,
+            padding: const EdgeInsets.all(2),
+            decoration: BoxDecoration(
+              color: currentIndex == index ? AppColors.primaryLight : null,
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: Row(
+              children: [
+                5.width,
+                Icon(pages[index]['icon'], size: 20),
+                5.width,
+                Text(
+                  pages[index]['title'],
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w600),
+                ).clickable(
+                  ontap: () => setState(() => currentIndex = index),
+                )
+              ],
+            ),
+          ),
+        ),
+        Row(children: [
+          5.width,
+          // AppConstante.powerSvg.toAsset(),
+          const Icon(Bootstrap.power, size: 20),
+          5.width,
+          const Text(
+            'Deconnexion',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          )
+        ]).clickable(
+          ontap: () {
+            AwesomeDialog(
+              width: 400,
+              dialogType: DialogType.question,
+              title: 'Deconnexion',
+              desc: 'Voulez-vous vous deconnecter?',
+              btnOkText: "Oui",
+              dismissOnTouchOutside: false,
+              btnCancelText: 'Annuler',
+              barrierColor: Colors.black.withAlpha(60),
+              btnOkColor: AppColors.black,
+              btnCancelOnPress: () {},
+              context: context,
+              btnOkOnPress: () async {
+                if (await CacheManager.user.remove()) {
+                  Get.offAll(() => const LoginScreen());
+                }
+              },
+            ).show();
+          },
+        )
+      ],
+    );
+  }
+
+  // ---------------------------- MOBILE -----------------------------------
+
+  Widget _buildMobile() {
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: _appBar(),
+      drawer: _buildDrawer(),
+      body: Padding(
+        padding: const EdgeInsets.all(10),
+        child: pages[currentIndex]['widget'],
+      ),
+      bottomNavigationBar: _bottomNavBar(),
+    );
+  }
+
+  Drawer _buildDrawer() {
+    return Drawer(
+      child: ListView(
+        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+        children: [
+          _desktopSidebar(),
+        ],
+      ),
+    );
+  }
+
+  Widget _bottomNavBar() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      margin: const EdgeInsets.all(5),
+      height: 80,
+      decoration: BoxDecoration(
+        color: AppColors.primaryLightAccent,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: List.generate(
+          bottomMenuPages.length,
+          (i) => _bottomItem(bottomMenuPages[i]),
+        ),
+      ),
+    );
+  }
+
+  Widget _bottomItem(int index) {
+    bool isActive = currentIndex == index;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(50),
-        color: currentIndex == index ? AppColors.primaryLight : null,
+        color: isActive ? AppColors.primaryLight : null,
       ),
       child: Row(
         spacing: 10,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Icon(pages[index]['icon'] as IconData),
-          if (currentIndex == index)
+          Icon(pages[index]['icon'], size: 22),
+          if (isActive)
             Text(
-              pages[index]['title'] as String,
-              style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18),
-            )
+              pages[index]['title'],
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
         ],
       ),
     ).clickable(
-        ontap: () => setState(() {
-              currentIndex = index;
-            }));
+      ontap: () => setState(() => currentIndex = index),
+    );
   }
 
-  Column desktopSection() {
-    return const Column(children: [
-      StatCard(
-          name: 'Locataire',
-          number: 3939,
-          icon: Iconsax.user_add_bold,
-          title: 'title',
-          subtitle: 'subtitle')
-    ]);
-  }
+  // ---------------------------- APP BAR -----------------------------------
 
-  AppBar appBar() {
+  AppBar _appBar() {
     return AppBar(
       title: Text(
-        pages[currentIndex]['title'] as String,
-        style: GoogleFonts.dmSans(),
+        pages[currentIndex]['title'],
+        style: GoogleFonts.dmSans(fontSize: 20),
       ),
       actions: [
         IconButton(
@@ -226,6 +254,8 @@ class _HomeViewState extends State<HomeView> {
   }
 }
 
+// ---------------------------- STAT CARD -----------------------------------
+
 class StatCard extends StatelessWidget {
   final String name;
   final int number;
@@ -233,13 +263,14 @@ class StatCard extends StatelessWidget {
   final String title;
   final String subtitle;
 
-  const StatCard(
-      {super.key,
-      required this.name,
-      required this.number,
-      required this.icon,
-      required this.title,
-      required this.subtitle});
+  const StatCard({
+    super.key,
+    required this.name,
+    required this.number,
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -248,10 +279,11 @@ class StatCard extends StatelessWidget {
       height: 80,
       width: 200,
       decoration: BoxDecoration(
-          border: Border.all(), borderRadius: BorderRadius.circular(16)),
+        border: Border.all(),
+        borderRadius: BorderRadius.circular(16),
+      ),
       child: Row(
         spacing: 10,
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           CircleAvatar(
             backgroundColor: AppColors.primaryLight,
@@ -264,11 +296,12 @@ class StatCard extends StatelessWidget {
             children: [
               Text(
                 title,
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               Text(subtitle),
-              // const SubmenuButton(menuChildren: [], child: Text('sub bbton'))
             ],
           )
         ],

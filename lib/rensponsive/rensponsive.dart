@@ -1,10 +1,10 @@
 import 'package:bayer/costante/export.dart';
 
-class Rensponsive extends StatelessWidget {
+class Responsive extends StatelessWidget {
   final Widget mobile;
   final Widget tablet;
   final Widget desktop;
-  const Rensponsive({
+  const Responsive({
     super.key,
     required this.mobile,
     required this.tablet,

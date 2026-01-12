@@ -1,6 +1,5 @@
 import 'package:bayer/costante/export.dart';
 import 'package:intl/intl.dart';
-import 'package:lottie/lottie.dart';
 
 extension Extentsion on String {
   Text get text => Text(this);
@@ -28,7 +27,7 @@ extension Extentsion on String {
         style: TextStyle(fontSize: size, color: textcolor),
       );
 
-  Text get bold => Text(this, style: TextStyle(fontWeight: FontWeight.bold));
+  Text get bold => Text(this, style: const TextStyle(fontWeight: FontWeight.bold));
 
   bool search(String query) => toLowerCase().contains(query.toLowerCase());
   String lower() {
@@ -112,7 +111,7 @@ extension MyDoubleExtension on double {
 }
 
 extension TextExtension on Text {
-  TextStyle get bold => TextStyle(fontWeight: FontWeight.bold);
+  TextStyle get bold => const TextStyle(fontWeight: FontWeight.bold);
 }
 
 extension CustunExtOnDate on DateTime {

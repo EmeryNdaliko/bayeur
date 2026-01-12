@@ -24,5 +24,7 @@ class AppColors {
   static const Color error = Color(0xFFF44336); // Erreur ou impayé
   static const Color red = Colors.red; //
   static const Color blue = Colors.blue; //
+  static Color bluelight = Colors.blue.shade100; //
+  static Color grey = Colors.grey.shade100; //
   static const Color black = Colors.black; //
 }

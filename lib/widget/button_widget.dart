@@ -54,7 +54,7 @@ class MyButton extends StatelessWidget {
 
   factory MyButton.outlined(
       {double? boder, required String label, VoidCallback? onTap}) {
-    if (boder == null) return MyButton();
+    if (boder == null) return const MyButton();
     return MyButton(
       bgColor: AppColors.primaryLightAccent,
       label: label,

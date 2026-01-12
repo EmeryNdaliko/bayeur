@@ -1,4 +1,3 @@
-import 'package:bayer/main.dart';
 import 'package:bayer/services/sqlite_manager.dart';
 import 'package:flutter/material.dart';
 

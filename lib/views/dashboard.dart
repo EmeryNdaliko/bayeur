@@ -43,15 +43,16 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
-    return Rensponsive(
+    return Responsive(
       desktop: Container(
         padding: const EdgeInsets.only(top: 30),
         decoration: BoxDecoration(
             color: AppColors.white, borderRadius: BorderRadius.circular(20)),
         child: Column(
           children: [
-            "Bonjour Emery Ndaliko !"
-                .textColor(size: 25, fontweight: FontWeight.w900),
+            // SvgPicture.asset('assets/icons/edit.svg'),
+            "Bonjour ${UserModel.current.toString()} !"
+                .textColor(size: 25, fontweight: FontWeight.w600),
             "Nous sommes ravis de vous revoir!".textColor(size: 18),
             30.height,
             Container(
@@ -63,13 +64,21 @@ class _DashboardState extends State<Dashboard> {
               child: Row(
                 children: [
                   Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    child: Row(
+                      spacing: 20,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        'Locataire'
-                            .textColor(fontweight: FontWeight.w900, size: 14),
-                        '00$locataires'
-                            .textColor(fontweight: FontWeight.w900, size: 30)
+                        const Icon(Iconsax.user_tag_outline, size: 30),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            'Locataire'.textColor(
+                                fontweight: FontWeight.w400, size: 14),
+                            '00$locataires'.textColor(
+                                fontweight: FontWeight.w600, size: 30)
+                          ],
+                        ),
                       ],
                     ),
                   ),
@@ -78,13 +87,21 @@ class _DashboardState extends State<Dashboard> {
                     child: VerticalDivider(),
                   ),
                   Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      spacing: 20,
                       children: [
-                        'Propriété'
-                            .textColor(fontweight: FontWeight.w900, size: 14),
-                        '00$properties'
-                            .textColor(fontweight: FontWeight.w900, size: 30)
+                        const Icon(Iconsax.house_outline, size: 30),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            'Propriété'.textColor(
+                                fontweight: FontWeight.w400, size: 14),
+                            '00$properties'.textColor(
+                                fontweight: FontWeight.w600, size: 30)
+                          ],
+                        ),
                       ],
                     ),
                   ),
@@ -93,20 +110,27 @@ class _DashboardState extends State<Dashboard> {
                     child: VerticalDivider(),
                   ),
                   Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      spacing: 20,
                       children: [
-                        'Autres'
-                            .textColor(fontweight: FontWeight.w900, size: 14),
-                        '399'.textColor(fontweight: FontWeight.w900, size: 30)
+                        const Icon(Iconsax.dollar_circle_outline, size: 30),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            'Solde'.textColor(
+                                fontweight: FontWeight.w400, size: 14),
+                            '399'.textColor(
+                                fontweight: FontWeight.w600, size: 30)
+                          ],
+                        ),
                       ],
                     ),
                   ),
                 ],
               ),
             ),
-           
-
           ],
         ),
       ),
@@ -143,13 +167,13 @@ class _DashboardState extends State<Dashboard> {
                       child: _buildCard(
                         'Locataires',
                         locataires.toString(),
-                        Icons.supervised_user_circle_rounded,
+                        Iconsax.user_tag_bold,
                       ),
                     ),
                     Expanded(
                       child: _buildCard(
                         'Propriétes',
-                        locataires.toString(),
+                        properties.toString(),
                         Iconsax.building_3_bold,
                       ),
                     ),
@@ -160,14 +184,14 @@ class _DashboardState extends State<Dashboard> {
                     Expanded(
                       child: _buildCard(
                         'Appartements',
-                        locataires.toString(),
-                        Icons.supervised_user_circle_rounded,
+                        '0000',
+                        Iconsax.house_2_bold,
                       ),
                     ),
                     Expanded(
                       child: _buildCard(
                         'Caisse',
-                        '500\$',
+                        '50\$',
                         Icons.monetization_on,
                       ),
                     ),
@@ -181,33 +205,9 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  Container _card() {
-    return Container(
-      height: 80,
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: const [
-            BoxShadow(
-                blurStyle: BlurStyle.outer,
-                offset: Offset(2, 0),
-                blurRadius: 5,
-                color: AppColors.primaryLight),
-          ]),
-      child: const Column(
-        children: [
-          Row(
-            children: [
-              Text('Locataires'),
-            ],
-          )
-        ],
-      ),
-    );
-  }
-
   Widget _buildCard(String title, String value, IconData icon) {
     return Card(
-      elevation: 10,
+      elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       color: Colors.white,
       child: Padding(
@@ -216,7 +216,7 @@ class _DashboardState extends State<Dashboard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Icon(icon, color: AppColors.primary, size: 30),
+            Icon(icon, color: AppColors.primaryLight, size: 30),
             Text(
               value,
               style: GoogleFonts.dmSans(
